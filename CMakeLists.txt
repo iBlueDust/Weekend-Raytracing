@@ -6,7 +6,7 @@ cmake_minimum_required (VERSION 3.8)
 project ("Weekend Raytracing")
 
 # Add source to this project's executable.
-add_executable (WeekendRaytracing "main.cpp" "main.h")
+add_executable (WeekendRaytracing "src/main.cpp" "src/main.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET WeekendRaytracing PROPERTY CXX_STANDARD 20)
