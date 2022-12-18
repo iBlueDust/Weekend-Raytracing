@@ -37,6 +37,8 @@ int main(int argc, char** argv) {
 	imageFile << "P3\n" << imageWidth << ' ' << imageHeight << "\n255\n";
 
 	for (int j = imageHeight - 1; j >= 0; j--) {
+		printf("\rScanlines remaining: %d ", j);
+		fflush(stdout);
 		for (int i = 0; i < imageWidth; i++) {
 			auto r = i / (double(imageWidth) - 1);
 			auto g = j / (double(imageHeight) - 1);
@@ -49,6 +51,8 @@ int main(int argc, char** argv) {
 			imageFile << ir << ' ' << ig << ' ' << ib << '\n';
 		}
 	}
+
+	printf("\nDone.\n");
 	
 	imageFile.close();
 	return 0;
