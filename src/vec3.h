@@ -133,7 +133,7 @@ inline vec3 operator/(const vec3 a, const double scale) {
 
 // Other methods
 inline double vec3::squareMagnitude() const {
-	return x * x + y * y + z * z;
+	return this->dot(*this);
 }
 
 inline double vec3::magnitude() const {
