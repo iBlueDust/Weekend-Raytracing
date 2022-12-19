@@ -8,6 +8,14 @@
 #include "main.h"
 #include "vec3.h"
 #include "color.h"
+#include "ray.h"
+
+
+color3 rayColor(const ray& ray) {
+	vec3 unitDirection = ray.direction.unit();
+	auto t = 0.5 * (unitDirection.y + 1.0);
+	return vec3::lerp(color3(1.0), color3(0.5, 0.7, 1.0), t);
+}
 
 
 int main(int argc, char** argv) {
@@ -31,8 +39,19 @@ int main(int argc, char** argv) {
 	
 	// Image
 
-	const int imageWidth = 256;
-	const int imageHeight = 256;
+	const double aspectRatio = 16.0 / 9.0;
+	const int imageWidth = 400;
+	const int imageHeight = static_cast<int>(imageWidth / aspectRatio);
+
+	// Camera
+	double viewportHeight = 2.0;
+	double viewportWidth = aspectRatio * viewportHeight;
+	double focalLength = 1.0;
+
+	auto origin = point3(0, 0, 0);
+	auto horizontal = vec3(viewportWidth, 0, 0);
+	auto vertical = vec3(0, viewportHeight, 0);
+	auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - vec3(0, 0, focalLength);
 
 	// Render
 
@@ -42,13 +61,12 @@ int main(int argc, char** argv) {
 		printf("\rScanlines remaining: %d ", j);
 		fflush(stdout);
 		for (int i = 0; i < imageWidth; i++) {
-			vec3 color(
-				i / (double(imageWidth) - 1),
-				j / (double(imageHeight) - 1),
-				0.25
-			);
+			auto u = double(i) / (imageWidth - 1);
+			auto v = double(j) / (imageHeight - 1);
+			ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
+			color3 pixelColor = rayColor(r);
 
-			writePixel(imageFile, color);
+			writePixel(imageFile, pixelColor);
 		}
 	}
 

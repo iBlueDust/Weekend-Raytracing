@@ -24,27 +24,33 @@ public:
 	inline vec3 operator-() const { return std::move(vec3(-x, -y, -z)); }
 
 	vec3& operator+=(const vec3& v) {
-		*this = *this + v;
+		x += v.x;
+		y += v.y;
+		z += v.z;
 		return *this;
 	}
 
 	vec3& operator-=(const vec3& v) {
-		*this = *this - v;
+		*this += -v;
 		return *this;
 	}
 
 	vec3& operator*=(const double scale) {
-		*this = *this * scale;
+		x *= scale;
+		y *= scale;
+		z *= scale;
 		return *this;
 	}
 
 	vec3& operator*=(const vec3& v) {
-		*this = *this * v;
+		x *= v.x;
+		y *= v.y;
+		z *= v.z;
 		return *this;
 	}
 
 	vec3& operator/=(const double scale) {
-		*this = *this / scale;
+		*this *= 1.0 / scale;
 		return *this;
 	}
 
@@ -63,17 +69,13 @@ public:
 		);
 	}
 
-	inline double squareMagnitude() const {
-		return x * x + y * y + z * z;
-	}
+	// Declare other methods (definition below)
+	inline double squareMagnitude() const;
+	inline double magnitude() const;
+	inline vec3 unit() const;
 
-	inline double magnitude() const {
-		return sqrt(squareMagnitude());
-	}
-
-	inline vec3 unit() const {
-		return *this / magnitude();
-	}
+	// Declare static methods (definition below)
+	static vec3 lerp(const vec3& a, const vec3& b, const double t);
 
 	void fprint(FILE* stream) {
 		fprintf(stream, "(%.3f, %.3f, %.3f)", x, y, z);
@@ -127,3 +129,27 @@ inline vec3 operator*(const vec3& a, const vec3& b) {
 inline vec3 operator/(const vec3 a, const double scale) {
 	return a * (1.0 / scale);
 }
+
+
+// Other methods
+inline double vec3::squareMagnitude() const {
+	return x * x + y * y + z * z;
+}
+
+inline double vec3::magnitude() const {
+	return sqrt(squareMagnitude());
+}
+
+inline vec3 vec3::unit() const {
+	return *this / magnitude();
+}
+
+// Static methods
+
+// Linear interpolation
+vec3 vec3::lerp(const vec3& a, const vec3& b, const double t) {
+	return (1.0 - t) * a + t * b;
+}
+
+
+
