@@ -10,12 +10,7 @@
 #include "vec3.h"
 #include "color.h"
 #include "ray.h"
-
-
-typedef struct {
-	point3 center;
-	double radius;
-} sphere;
+#include "sphere.h"
 
 
 std::optional<point3> hitSphere(const sphere& sphere, const ray& ray) {
