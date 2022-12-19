@@ -23,43 +23,6 @@ public:
 	inline vec3 operator+() const { return *this; }
 	inline vec3 operator-() const { return std::move(vec3(-x, -y, -z)); }
 
-	inline vec3 operator+(const vec3& b) {
-		return std::move(
-			vec3(
-				x + b.x,
-				y + b.y,
-				z + b.z
-			)
-		);
-	}
-	inline vec3 operator-(const vec3& b) {
-		return *this + -b;
-	}
-	
-	inline vec3 operator*(const double scale) {
-		return std::move(
-			vec3(
-				x * scale,
-				y * scale,
-				z * scale
-			)
-		);
-	}
-
-	inline vec3 operator*(const vec3& b) {
-		return std::move(
-			vec3(
-				x * b.x,
-				y * b.y,
-				z * b.z
-			)
-		);
-	}
-
-	inline vec3 operator/(const double scale) {
-		return *this * (1 / scale);
-	}
-
 	vec3& operator+=(const vec3& v) {
 		*this = *this + v;
 		return *this;
@@ -91,10 +54,12 @@ public:
 	}
 
 	inline vec3 cross(const vec3 &b) {
-		return vec3(
-			y * b.z - z * b.y,
-			z * b.x - x * b.z,
-			x * b.y - y * b.x
+		return std::move(
+			vec3(
+				y * b.z - z * b.y,
+				z * b.x - x * b.z,
+				x * b.y - y * b.x
+			)
 		);
 	}
 
@@ -106,7 +71,7 @@ public:
 		return sqrt(squareMagnitude());
 	}
 
-	inline vec3 unit() {
+	inline vec3 unit() const {
 		return *this / magnitude();
 	}
 
@@ -118,3 +83,47 @@ public:
 // Type aliases to prevent arithmetic between colors, geometrical points, etc.
 using point3 = vec3;
 using color3 = vec3;
+
+
+// Utility functions
+
+inline vec3 operator+(const vec3& a, const vec3& b) {
+	return std::move(
+		vec3(
+			a.x + b.x,
+			a.y + b.y,
+			a.z + b.z
+		)
+	);
+}
+inline vec3 operator-(const vec3& a, const vec3& b) {
+	return a + -b;
+}
+
+inline vec3 operator*(const vec3& a, const double scale) {
+	return std::move(
+		vec3(
+			a.x * scale,
+			a.y * scale,
+			a.z * scale
+		)
+	);
+}
+
+inline vec3 operator*(const double scale, const vec3& a) {
+	return a * scale;
+}
+
+inline vec3 operator*(const vec3& a, const vec3& b) {
+	return std::move(
+		vec3(
+			a.x * b.x,
+			a.y * b.y,
+			a.z * b.z
+		)
+	);
+}
+
+inline vec3 operator/(const vec3 a, const double scale) {
+	return a * (1.0 / scale);
+}

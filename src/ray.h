@@ -2,7 +2,7 @@
 
 #include "vec3.h"
 
-class Ray {
+class ray {
 public:
 	// Using linear algebra representation
 	// r = a + bt
