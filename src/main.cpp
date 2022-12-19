@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "main.h"
+#include "vec3.h"
 
 
 int main(int argc, char** argv) {
@@ -40,6 +41,11 @@ int main(int argc, char** argv) {
 		printf("\rScanlines remaining: %d ", j);
 		fflush(stdout);
 		for (int i = 0; i < imageWidth; i++) {
+			vec3 color;
+			color += vec3(1 / (double(imageWidth) - 1), 1 / (double(imageHeight) - 1), 0.0);
+			color *= vec3(double(i), double(j), 0.0);
+			color = color + vec3(0.0, 0.0, 0.25);
+
 			auto r = i / (double(imageWidth) - 1);
 			auto g = j / (double(imageHeight) - 1);
 			auto b = 0.25;
