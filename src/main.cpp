@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
+#include <optional>
 
 #include "main.h"
 #include "vec3.h"
@@ -17,7 +18,7 @@ typedef struct {
 } sphere;
 
 
-bool hitSphere(const sphere& sphere, const ray& ray) {
+std::optional<point3> hitSphere(const sphere& sphere, const ray& ray) {
 	auto deltaCenter = ray.origin - sphere.center;
 
 	// Setup quadratic equation
@@ -26,14 +27,33 @@ bool hitSphere(const sphere& sphere, const ray& ray) {
 	double c = deltaCenter.squareMagnitude() - sphere.radius * sphere.radius;
 
 	auto discriminant = b * b - 4 * a * c;
-	return discriminant >= 0;
+	if (discriminant < 0.0)
+		return {};
+
+	double sqrtDiscriminant = sqrt(discriminant);
+	double t1 = (-b + sqrtDiscriminant) / (2 * a);
+	double t2 = (-b - sqrtDiscriminant) / (2 * a);
+	double t;
+
+	// If ray starts from inside the circle
+	// (notice that t1 >= t2)
+	if (t2 < 0) {
+		t = t1;
+	} else {
+		t = t2;
+	}
+
+	return ray.at(t);
 }
 
 
 color3 rayColor(const ray& ray) {
 	const sphere sphere = { { 0, 0, -1 }, 0.5 };
-	if (hitSphere(sphere, ray))
-		return color3(1.0, 0.0, 0.0);
+	auto hitPoint = hitSphere(sphere, ray);
+	if (hitPoint.has_value()) {
+		auto normal = (hitPoint.value() - sphere.center).unit();
+		return static_cast<color3>(0.5 * (normal + 1.0));
+	}
 
 	vec3 unitDirection = ray.direction.unit();
 	auto t = 0.5 * (unitDirection.y + 1.0);
@@ -53,13 +73,13 @@ int main(int argc, char** argv) {
 	}
 
 	// File
-	std::ofstream imageFile (argv[1]);
+	std::ofstream imageFile(argv[1]);
 	if (!imageFile.is_open()) {
 		// Check this line for vulnerabilities vvv
 		printf("Error opening file %.200s\n", argv[1]);
 		return 1;
 	}
-	
+
 	// Image
 
 	const double aspectRatio = 16.0 / 9.0;
@@ -94,7 +114,7 @@ int main(int argc, char** argv) {
 	}
 
 	printf("\nDone.\n");
-	
+
 	imageFile.close();
 	return 0;
 }
