@@ -11,7 +11,30 @@
 #include "ray.h"
 
 
+typedef struct {
+	point3 center;
+	double radius;
+} sphere;
+
+
+bool hitSphere(const sphere& sphere, const ray& ray) {
+	auto deltaCenter = ray.origin - sphere.center;
+
+	// Setup quadratic equation
+	double a = ray.direction.squareMagnitude();
+	double b = 2 * ray.direction.dot(deltaCenter);
+	double c = deltaCenter.squareMagnitude() - sphere.radius * sphere.radius;
+
+	auto discriminant = b * b - 4 * a * c;
+	return discriminant >= 0;
+}
+
+
 color3 rayColor(const ray& ray) {
+	const sphere sphere = { { 0, 0, -1 }, 0.5 };
+	if (hitSphere(sphere, ray))
+		return color3(1.0, 0.0, 0.0);
+
 	vec3 unitDirection = ray.direction.unit();
 	auto t = 0.5 * (unitDirection.y + 1.0);
 	return vec3::lerp(color3(1.0), color3(0.5, 0.7, 1.0), t);

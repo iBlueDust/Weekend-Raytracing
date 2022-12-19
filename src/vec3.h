@@ -55,11 +55,11 @@ public:
 	}
 
 	// Utility functions
-	inline double dot(const vec3 &b) {
+	inline double dot(const vec3 &b) const {
 		return x * b.x + y * b.y + z * b.z;
 	}
 
-	inline vec3 cross(const vec3 &b) {
+	inline vec3 cross(const vec3 &b) const {
 		return std::move(
 			vec3(
 				y * b.z - z * b.y,
