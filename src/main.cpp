@@ -11,6 +11,8 @@
 #include "color.h"
 #include "ray.h"
 #include "sphere.h"
+#include "hittable.h"
+#include "hittable_list.h"
 
 
 std::optional<point3> hitSphere(const sphere& sphere, const ray& ray) {
