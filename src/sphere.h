@@ -42,7 +42,8 @@ std::optional<hit_record> sphere::hit(const ray& ray, double tMin, double tMax) 
 	hit_record result;
 	result.intersection = ray.at(t);
 	result.t = t;
-	result.normal = (result.intersection - center) / radius;
+	auto outwardNormal = (result.intersection - center) / radius;
+	result.setNormalFromOutwardNormal(ray, outwardNormal);
 
 	return result;
 }
