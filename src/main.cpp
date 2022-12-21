@@ -15,41 +15,12 @@
 #include "hittable_list.h"
 
 
-std::optional<point3> hitSphere(const sphere& sphere, const ray& ray) {
-	auto deltaCenter = ray.origin - sphere.center;
-
-	// Setup quadratic equation
-	double a = ray.direction.squareMagnitude();
-	double b = 2 * ray.direction.dot(deltaCenter);
-	double c = deltaCenter.squareMagnitude() - sphere.radius * sphere.radius;
-
-	auto discriminant = b * b - 4 * a * c;
-	if (discriminant < 0.0)
-		return {};
-
-	double sqrtDiscriminant = sqrt(discriminant);
-	double t1 = (-b + sqrtDiscriminant) / (2 * a);
-	double t2 = (-b - sqrtDiscriminant) / (2 * a);
-	double t;
-
-	// If ray starts from inside the circle
-	// (notice that t1 >= t2)
-	if (t2 < 0) {
-		t = t1;
-	} else {
-		t = t2;
-	}
-
-	return ray.at(t);
-}
-
-
-color3 rayColor(const ray& ray) {
-	const sphere sphere = { { 0, 0, -1 }, 0.5 };
-	auto hitPoint = hitSphere(sphere, ray);
-	if (hitPoint.has_value()) {
-		auto normal = (hitPoint.value() - sphere.center).unit();
-		return static_cast<color3>(0.5 * (normal + 1.0));
+color3 rayColor(const hittable_list& world, const ray& ray) {
+	constexpr double INFTY = std::numeric_limits<double>::infinity();
+	
+	auto record = world.hit(ray, 0.0, INFTY);
+	if (record.has_value()) {
+		return static_cast<color3>(0.5 * (record.value().normal + vec3(1.0)));
 	}
 
 	vec3 unitDirection = ray.direction.unit();
@@ -83,7 +54,14 @@ int main(int argc, char** argv) {
 	const int imageWidth = 400;
 	const int imageHeight = static_cast<int>(imageWidth / aspectRatio);
 
+	// World
+
+	hittable_list world;
+	world.add(std::make_shared<sphere>(point3(0, 0, -1), 0.5));
+	world.add(std::make_shared<sphere>(point3(0, -100.5, -1), 100));
+
 	// Camera
+	
 	double viewportHeight = 2.0;
 	double viewportWidth = aspectRatio * viewportHeight;
 	double focalLength = 1.0;
@@ -104,7 +82,7 @@ int main(int argc, char** argv) {
 			auto u = double(i) / (imageWidth - 1);
 			auto v = double(j) / (imageHeight - 1);
 			ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
-			color3 pixelColor = rayColor(r);
+			color3 pixelColor = rayColor(world, r);
 
 			writePixel(imageFile, pixelColor);
 		}
