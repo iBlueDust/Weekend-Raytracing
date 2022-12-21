@@ -17,7 +17,7 @@ struct hit_record {
 	inline void setNormalFromOutwardNormal(const ray& ray, const vec3& outwardNormal) {
 		// the ray and the normal should be facing against each other
 		frontFace = ray.direction.dot(outwardNormal) < 0.0; 
-		normal = (!frontFace * -1) * outwardNormal;
+		normal = frontFace ? outwardNormal : -outwardNormal;
 	}
 };
 

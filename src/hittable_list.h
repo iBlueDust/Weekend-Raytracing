@@ -47,7 +47,7 @@ std::optional<hit_record> hittable_list::hit(const ray& ray, double tMin, double
 		if (!record)
 			continue;
 
-		if (!record || minT > record.value().t) {
+		if (!closestHit || minT > record.value().t) {
 			minT = record.value().t;
 			closestHit = std::optional<hit_record>(record);
 		}
