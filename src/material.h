@@ -47,8 +47,10 @@ public:
 class metal : public material {
 public:
 	color3 albedo;
+	double fuzz;
 
-	metal(const color3& albedo) : albedo(albedo) {}
+	metal(const color3& albedo, double fuzz)
+		: albedo(albedo), fuzz(std::clamp(fuzz, 0.0, 1.0)) {}
 
 	virtual std::optional<scatter_result> scatter(
 		const ray& rayIn, const hit_record& record
@@ -61,8 +63,13 @@ public:
 		if (reflected.dot(record.normal) <= 0.0)
 			return {};
 
+		auto outRay = ray(
+			record.intersection, 
+			reflected + fuzz * vec3::randomInUnitSphere()
+		);
+
 		scatter_result result = {
-			/* outRay */      ray(record.intersection, reflected),
+			/* outRay */      outRay,
 			/* attenuation */ albedo
 		};
 		return std::optional(result);
