@@ -43,13 +43,14 @@ std::optional<hit_record> hittable_list::hit(const ray& ray, double tMin, double
 	std::optional<hit_record> closestHit = {};
 
 	for (const auto& hittable : hittables) {
-		auto record = hittable->hit(ray, tMin, tMax);
-		if (!record)
+		auto hit = hittable->hit(ray, tMin, tMax);
+		if (!hit)
 			continue;
 
-		if (!closestHit || minT > record.value().t) {
-			minT = record.value().t;
-			closestHit = std::optional<hit_record>(record);
+		auto record = hit.value();
+		if (!closestHit || minT > record.t) {
+			minT = record.t;
+			closestHit = std::optional<hit_record>(hit);
 		}
 	}
 

@@ -3,6 +3,7 @@
 #include "vec3.h"
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 void writePixel(std::ostream& stream, color3 pixel) {
@@ -12,11 +13,11 @@ void writePixel(std::ostream& stream, color3 pixel) {
 }
 
 void writePixel(std::ostream& stream, color3 pixel, int sampleCount) {
-	pixel /= sampleCount;
+	pixel *= 1.0 / sampleCount;
 
-	pixel.x = std::clamp(pixel.x, 0.0, 0.999);
-	pixel.y = std::clamp(pixel.y, 0.0, 0.999);
-	pixel.z = std::clamp(pixel.z, 0.0, 0.999);
+	pixel.x = std::clamp(std::sqrt(pixel.x), 0.0, 1.0);
+	pixel.y = std::clamp(std::sqrt(pixel.y), 0.0, 1.0);
+	pixel.z = std::clamp(std::sqrt(pixel.z), 0.0, 1.0);
 
 	writePixel(stream, pixel);
 }

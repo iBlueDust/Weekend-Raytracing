@@ -16,15 +16,22 @@
 #include "hittable_list.h"
 
 
-color3 rayColor(const hittable_list& world, const ray& ray) {
+color3 rayColor(const hittable_list& world, const ray& r, int maxBounces) {
 	constexpr double INFTY = std::numeric_limits<double>::infinity();
+	constexpr double absorption = 0.5;
+
+	if (maxBounces <= 0)
+		return color3(0);
 	
-	auto record = world.hit(ray, 0.0, INFTY);
-	if (record.has_value()) {
-		return static_cast<color3>(0.5 * (record.value().normal + vec3(1.0)));
+	auto hit = world.hit(r, 0.0, INFTY);
+	if (hit.has_value()) {
+		auto record = hit.value();
+		vec3 diffuseDirection = record.normal + vec3::randomInUnitSphere();
+		ray diffuseRay(record.intersection, diffuseDirection);
+		return absorption * rayColor(world, diffuseRay, maxBounces - 1);
 	}
 
-	vec3 unitDirection = ray.direction.unit();
+	vec3 unitDirection = r.direction.unit();
 	auto t = 0.5 * (unitDirection.y + 1.0);
 	return vec3::lerp(color3(1.0), color3(0.5, 0.7, 1.0), t);
 }
@@ -55,6 +62,7 @@ int main(int argc, char** argv) {
 	const int imageWidth = 400;
 	const int imageHeight = static_cast<int>(imageWidth / aspectRatio);
 	const int sampleCount = 100;
+	const int maxBounces = 50;
 
 	// World
 
@@ -75,13 +83,13 @@ int main(int argc, char** argv) {
 		fflush(stdout);
 		for (int i = 0; i < imageWidth; i++) {
 
-			color3 pixel = {};
+			color3 pixel(0, 0, 0);
 			for (int s = 0; s < sampleCount; s++) {
 				auto u = double(i + randomDouble()) / (imageWidth - 1);
 				auto v = double(j + randomDouble()) / (imageHeight - 1);
 
 				ray ray = mainCamera.rayFromUV(u, v);
-				pixel += rayColor(world, ray);
+				pixel += rayColor(world, ray, maxBounces);
 			}
 
 			writePixel(imageFile, pixel, sampleCount);

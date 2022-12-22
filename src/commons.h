@@ -1,4 +1,4 @@
-#pragma random
+#pragma once
 
 #include <random>
 

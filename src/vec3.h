@@ -2,6 +2,7 @@
 
 #include <math.h>
 
+#include "commons.h"
 
 class vec3 {
 public:
@@ -70,12 +71,15 @@ public:
 	}
 
 	// Declare other methods (definition below)
+	
 	inline double squareMagnitude() const;
 	inline double magnitude() const;
 	inline vec3 unit() const;
 
 	// Declare static methods (definition below)
+	
 	static vec3 lerp(const vec3& a, const vec3& b, const double t);
+	static vec3 randomInUnitSphere();
 
 	void fprint(FILE* stream) {
 		fprintf(stream, "(%.3f, %.3f, %.3f)", x, y, z);
@@ -149,6 +153,18 @@ inline vec3 vec3::unit() const {
 // Linear interpolation
 vec3 vec3::lerp(const vec3& a, const vec3& b, const double t) {
 	return (1.0 - t) * a + t * b;
+}
+
+vec3 vec3::randomInUnitSphere() {
+	while (1) {
+		vec3 candidate = vec3(
+			randomDouble(-1.0, 1.0), 
+			randomDouble(-1.0, 1.0), 
+			randomDouble(-1.0, 1.0)
+		);
+		if (candidate.squareMagnitude() < 1.0)
+			return candidate;
+	}
 }
 
 
