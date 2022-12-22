@@ -92,8 +92,17 @@ int main(int argc, char** argv) {
 
 
 	// Camera
+	camera_config cameraConfig;
+	cameraConfig.lookFrom             = point3(  3,  3,  2);
+	cameraConfig.lookAt               = point3(  0,  0, -1);
+	cameraConfig.worldUp              = vec3  (  0,  1,  0);
+	cameraConfig.verticalFovInDegrees = 20; // in degrees
+	cameraConfig.aspectRatio          = aspectRatio;
+	cameraConfig.aperture             = 2.0;
+	cameraConfig.focalLength          = 
+		(cameraConfig.lookAt - cameraConfig.lookFrom).magnitude();
 
-	camera mainCamera(point3(-2, 2, 1), point3(0, 0, -1), vec3(0, 1, 0), 20, aspectRatio);
+	camera mainCamera(cameraConfig);
 
 	// Render
 

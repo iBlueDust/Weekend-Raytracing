@@ -4,36 +4,47 @@
 #include "ray.h"
 #include "vec3.h"
 
+struct camera_config {
+    point3 lookFrom;
+    point3 lookAt;
+    vec3 worldUp;
+    double verticalFovInDegrees;
+    double aspectRatio;
+    double aperture;
+    double focalLength;
+};
+
 class camera {
 public: 
-	camera(
-        point3 lookFrom,
-        point3 lookAt,
-        vec3 worldUp,
-        double verticalFovInDegrees, 
-        double aspectRatio
-    ) {
-        auto theta = degreesToRadians(verticalFovInDegrees);
+	camera(camera_config config) {
+        auto theta = degreesToRadians(config.verticalFovInDegrees);
         auto viewportHeight = 2.0 * std::tan(theta / 2.0);
-        auto viewportWidth = aspectRatio * viewportHeight;
-        auto focalLength = 1.0;
+        auto viewportWidth = config.aspectRatio * viewportHeight;
 
-        auto backward = (lookFrom - lookAt).unit();
-        auto right = worldUp.cross(backward).unit();
-        auto up = backward.cross(right);
+        forward = (config.lookAt - config.lookFrom).unit();
+        right = forward.cross(config.worldUp).unit();
+        up = right.cross(forward);
 
-        position = lookFrom;
-        horizontal = viewportWidth * right;
-        vertical = viewportHeight * up;
+        position = config.lookFrom;
+        horizontal = viewportWidth * right * config.focalLength;
+        vertical = viewportHeight * up * config.focalLength;
         lowerLeftCorner = 
             position - horizontal / 2 - vertical / 2 
-            - backward * focalLength;
+            + forward * config.focalLength;
+
+        lensRadius = config.aperture / 2;
 	}
 
     ray rayFromUV(double screenU, double screenV) const {
+        vec3 lensPosition = lensRadius * vec3::randomInUnitDisk();
+        vec3 offset = right * lensPosition.x + up * lensPosition.y;
+
         return ray(
-            position, 
-            lowerLeftCorner + screenU * horizontal + screenV * vertical - position
+            position + offset, 
+            lowerLeftCorner
+            + screenU * horizontal 
+            + screenV * vertical
+            - position - offset
         );
     }
 
@@ -45,4 +56,6 @@ private:
     // the other to the camera's up (vertical).
     // Their origin is (0,0,0)
     vec3 horizontal, vertical;
+    vec3 forward, right, up;
+    double lensRadius;
 };

@@ -84,6 +84,7 @@ public:
 	static vec3 lerp(const vec3& a, const vec3& b, const double t);
 	static vec3 randomInUnitSphere();
 	static vec3 randomOnUnitSphere();
+	static vec3 randomInUnitDisk();
 
 	void fprint(FILE* stream) {
 		fprintf(stream, "(%.3f, %.3f, %.3f)", x, y, z);
@@ -196,5 +197,15 @@ vec3 vec3::randomOnUnitSphere() {
 	return vec3::randomInUnitSphere().unit();
 }
 
-
+vec3 vec3::randomInUnitDisk() {
+	while (1) {
+		vec3 candidate = vec3(
+			randomDouble(-1.0, 1.0),
+			randomDouble(-1.0, 1.0),
+			0.0
+		);
+		if (candidate.squareMagnitude() < 1.0)
+			return candidate;
+	}
+}
 
