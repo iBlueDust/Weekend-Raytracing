@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <optional>
 
 #include "hittable.h"
@@ -90,10 +91,11 @@ public:
 		double cosTheta = std::min(-inUnitDirection.dot(record.normal), 1.0);
 		double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 		
+		bool cantRefract = iorRatio * sinTheta > 1.0;
 		vec3 outDirection;
 
 		// Check for total internal reflection
-		if (iorRatio * sinTheta > 1.0)
+		if (cantRefract || reflectance(cosTheta, iorRatio) > randomDouble())
 			outDirection = inUnitDirection.reflect(record.normal);
 		else
 			outDirection = inUnitDirection.refract(record.normal, iorRatio);
@@ -103,5 +105,13 @@ public:
 			/* attenuation */ color3(1.0) // Always white
 		};
 		return std::optional(result);
+	}
+
+private:
+	static double reflectance(double cosTheta, double iorRatio) {
+		// Schlick's approximation for fresnel reflectance
+		auto r0 = (1.0 - iorRatio) / (1.0 + iorRatio);
+		r0 *= r0; // square it
+		return r0 + (1.0 - r0) * std::pow(1 - cosTheta, 5);
 	}
 };
