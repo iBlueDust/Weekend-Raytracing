@@ -8,6 +8,7 @@
 
 #include "main.h"
 #include "vec3.h"
+#include "camera.h"
 #include "color.h"
 #include "ray.h"
 #include "sphere.h"
@@ -53,6 +54,7 @@ int main(int argc, char** argv) {
 	const double aspectRatio = 16.0 / 9.0;
 	const int imageWidth = 400;
 	const int imageHeight = static_cast<int>(imageWidth / aspectRatio);
+	const int sampleCount = 100;
 
 	// World
 
@@ -62,14 +64,7 @@ int main(int argc, char** argv) {
 
 	// Camera
 	
-	double viewportHeight = 2.0;
-	double viewportWidth = aspectRatio * viewportHeight;
-	double focalLength = 1.0;
-
-	auto origin = point3(0, 0, 0);
-	auto horizontal = vec3(viewportWidth, 0, 0);
-	auto vertical = vec3(0, viewportHeight, 0);
-	auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - vec3(0, 0, focalLength);
+	camera mainCamera;
 
 	// Render
 
@@ -79,12 +74,17 @@ int main(int argc, char** argv) {
 		printf("\rScanlines remaining: %d ", j);
 		fflush(stdout);
 		for (int i = 0; i < imageWidth; i++) {
-			auto u = double(i) / (imageWidth - 1);
-			auto v = double(j) / (imageHeight - 1);
-			ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
-			color3 pixelColor = rayColor(world, r);
 
-			writePixel(imageFile, pixelColor);
+			color3 pixel = {};
+			for (int s = 0; s < sampleCount; s++) {
+				auto u = double(i + randomDouble()) / (imageWidth - 1);
+				auto v = double(j + randomDouble()) / (imageHeight - 1);
+
+				ray ray = mainCamera.rayFromUV(u, v);
+				pixel += rayColor(world, ray);
+			}
+
+			writePixel(imageFile, pixel, sampleCount);
 		}
 	}
 
