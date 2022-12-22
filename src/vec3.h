@@ -76,6 +76,7 @@ public:
 	inline double magnitude() const;
 	inline vec3 unit() const;
 	inline bool nearZero() const;
+	vec3 refract(const vec3& normal, double iorRatio) const;
 
 	// Declare static methods (definition below)
 	
@@ -153,6 +154,17 @@ inline vec3 vec3::unit() const {
 inline bool vec3::nearZero() const {
 	constexpr double epsilon = 1e-8;
 	return squareMagnitude() < epsilon;
+}
+
+vec3 vec3::refract(const vec3& normal, double iorRatio) const {
+	auto rayIn = this->unit();
+	auto cosTheta = std::min(-rayIn.dot(normal), 1.0);
+	vec3 perpendicularComponent = iorRatio * (rayIn + normal * cosTheta);
+	vec3 parallelComponent = 
+		-std::sqrt(
+			std::abs(1.0 - perpendicularComponent.squareMagnitude())
+		) * normal;
+	return perpendicularComponent + parallelComponent;
 }
 
 // Static methods

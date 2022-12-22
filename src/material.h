@@ -75,3 +75,25 @@ public:
 		return std::optional(result);
 	}
 };
+
+// Material that always refracts light
+class dielectric : public material {
+public:
+	double ior;
+
+	dielectric(double indexOfRefraction) : ior(indexOfRefraction) {}
+
+	virtual std::optional<scatter_result> scatter(
+		const ray& rayIn, const hit_record& record
+	) const override {
+		// Assumes air has an IOR of 1.000
+		double iorRatio = record.frontFace ? 1.0 / ior : ior;
+		vec3 refracted = rayIn.direction.refract(record.normal, iorRatio);
+
+		scatter_result result = {
+			ray(record.intersection, refracted),
+			color3(1.0)
+		};
+		return std::optional(result);
+	}
+};
