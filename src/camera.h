@@ -6,9 +6,9 @@
 
 class camera {
 public: 
-	camera() {
-        auto aspectRatio = 16.0 / 9.0;
-        auto viewportHeight = 2.0;
+	camera(double verticalFovInDegrees, double aspectRatio) {
+        auto theta = degreesToRadians(verticalFovInDegrees);
+        auto viewportHeight = 2.0 * std::tan(theta / 2.0);
         auto viewportWidth = aspectRatio * viewportHeight;
         auto focalLength = 1.0;
 
