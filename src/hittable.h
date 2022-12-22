@@ -3,13 +3,17 @@
 
 #pragma once
 
+#include <memory>
 #include <optional>
 
 #include "ray.h"
 
+class material;
+
 struct hit_record {
 	point3 intersection;
 	vec3 normal;
+	std::shared_ptr<material> materialPtr;
 	double t; // parameter of ray
 	bool frontFace; // whether the normal faces in this direction (& for back-face culling)
 

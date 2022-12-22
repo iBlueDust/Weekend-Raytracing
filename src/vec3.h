@@ -75,6 +75,7 @@ public:
 	inline double squareMagnitude() const;
 	inline double magnitude() const;
 	inline vec3 unit() const;
+	inline bool nearZero() const;
 
 	// Declare static methods (definition below)
 	
@@ -147,6 +148,11 @@ inline double vec3::magnitude() const {
 
 inline vec3 vec3::unit() const {
 	return *this / magnitude();
+}
+
+inline bool vec3::nearZero() const {
+	constexpr double epsilon = 1e-8;
+	return squareMagnitude() < epsilon;
 }
 
 // Static methods

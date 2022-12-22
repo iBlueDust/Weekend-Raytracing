@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <optional>
 
 #include "hittable.h"
@@ -10,9 +11,11 @@ class sphere : public hittable {
 public:
 	point3 center;
 	double radius;
+	std::shared_ptr<material> materialPtr;
 
 	sphere() {}
-	sphere(point3 center, double radius) : center(center), radius(radius) {}
+	sphere(point3 center, double radius, std::shared_ptr<material> materialPtr) 
+		: center(center), radius(radius), materialPtr(materialPtr) {}
 
 	virtual std::optional<hit_record> hit(const ray& ray, double tMin, double tMax) const override;
 };
@@ -44,6 +47,7 @@ std::optional<hit_record> sphere::hit(const ray& ray, double tMin, double tMax) 
 	result.t = t;
 	auto outwardNormal = (result.intersection - center) / radius;
 	result.setNormalFromOutwardNormal(ray, outwardNormal);
+	result.materialPtr = materialPtr;
 
 	return result;
 }
