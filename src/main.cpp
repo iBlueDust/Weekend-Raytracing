@@ -76,9 +76,9 @@ int main(int argc, char** argv) {
 	hittable_list world;
 	
 	auto materialGround = std::make_shared<lambertian_diffuse>(color3(0.8, 0.8, 0.0));
-	auto materialCenter = std::make_shared<lambertian_diffuse>(color3(0.7, 0.3, 0.3));
+	auto materialCenter = std::make_shared<lambertian_diffuse>(color3(0.1, 0.2, 0.5));
 	auto materialLeft = std::make_shared<dielectric>(1.5);
-	auto materialRight = std::make_shared<dielectric>(1.5);
+	auto materialRight = std::make_shared<metal>(color3(0.8, 0.6, 0.2), 0.0);
 
 	world.add(std::make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, materialGround));
 	world.add(std::make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, materialCenter));

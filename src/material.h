@@ -55,18 +55,16 @@ public:
 	virtual std::optional<scatter_result> scatter(
 		const ray& rayIn, const hit_record& record
 	) const override {
-		auto rayDirection = rayIn.direction.unit();
+		auto inUnitDirection = rayIn.direction.unit();
 		auto normal = record.normal;
-		vec3 reflected = rayDirection - 2 * rayDirection.dot(normal) * normal;
+		vec3 reflected = inUnitDirection.reflect(normal);
 
 		// If ray is coming from inside somehow
 		if (reflected.dot(record.normal) <= 0.0)
 			return {};
 
-		auto outRay = ray(
-			record.intersection, 
-			reflected + fuzz * vec3::randomInUnitSphere()
-		);
+		auto outDirection = reflected + fuzz * vec3::randomInUnitSphere();
+		auto outRay = ray(record.intersection, outDirection);
 
 		scatter_result result = {
 			/* outRay */      outRay,
@@ -87,12 +85,22 @@ public:
 		const ray& rayIn, const hit_record& record
 	) const override {
 		// Assumes air has an IOR of 1.000
-		double iorRatio = record.frontFace ? 1.0 / ior : ior;
-		vec3 refracted = rayIn.direction.refract(record.normal, iorRatio);
+		double iorRatio = record.frontFace ? (1.0 / ior) : ior;
+		auto inUnitDirection = rayIn.direction.unit();
+		double cosTheta = std::min(-inUnitDirection.dot(record.normal), 1.0);
+		double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
+		
+		vec3 outDirection;
+
+		// Check for total internal reflection
+		if (iorRatio * sinTheta > 1.0)
+			outDirection = inUnitDirection.reflect(record.normal);
+		else
+			outDirection = inUnitDirection.refract(record.normal, iorRatio);
 
 		scatter_result result = {
-			ray(record.intersection, refracted),
-			color3(1.0)
+			/* outRay */      ray(record.intersection, outDirection),
+			/* attenuation */ color3(1.0) // Always white
 		};
 		return std::optional(result);
 	}
