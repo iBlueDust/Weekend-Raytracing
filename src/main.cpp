@@ -27,7 +27,7 @@ color3 rayColor(const hittable_list& world, const ray& r, int maxBounces) {
 	auto hit = world.hit(r, 0.001, INFTY);
 	if (hit.has_value()) {
 		auto record = hit.value();
-		vec3 diffuseDirection = record.normal + vec3::randomInUnitSphere();
+		vec3 diffuseDirection = record.normal + vec3::randomOnUnitSphere();
 		ray diffuseRay(record.intersection, diffuseDirection);
 		return absorption * rayColor(world, diffuseRay, maxBounces - 1);
 	}

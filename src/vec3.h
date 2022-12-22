@@ -80,6 +80,7 @@ public:
 	
 	static vec3 lerp(const vec3& a, const vec3& b, const double t);
 	static vec3 randomInUnitSphere();
+	static vec3 randomOnUnitSphere();
 
 	void fprint(FILE* stream) {
 		fprintf(stream, "(%.3f, %.3f, %.3f)", x, y, z);
@@ -165,6 +166,10 @@ vec3 vec3::randomInUnitSphere() {
 		if (candidate.squareMagnitude() < 1.0)
 			return candidate;
 	}
+}
+
+vec3 vec3::randomOnUnitSphere() {
+	return vec3::randomInUnitSphere().unit();
 }
 
 
