@@ -25,7 +25,7 @@ color3 rayColor(const hittable_list& world, const ray& r, int maxBounces) {
 
 	if (maxBounces <= 0)
 		return color3(0);
-	
+
 	// 0.001 comes from "8.4 Fixing Shadow Acne"
 	auto hit = world.hit(r, 0.001, INFTY);
 	if (hit) {
@@ -76,16 +76,24 @@ int main(int argc, char** argv) {
 
 	auto R = std::cos(std::numbers::pi / 4.0);
 	hittable_list world;
-	
-	auto materialLeft = std::make_shared<lambertian_diffuse>(color3(0, 0, 1));
-	auto materialRight = std::make_shared<lambertian_diffuse>(color3(1, 0, 0));
 
-	world.add(std::make_shared<sphere>(point3(-R, 0.0, -1.0), R, materialLeft)); 
-	world.add(std::make_shared<sphere>(point3(R, 0.0, -1.0), R, materialRight));
+	auto materialGround = std::make_shared<lambertian_diffuse>(color3(0.8, 0.8, 0.0));
+	auto materialCenter = std::make_shared<lambertian_diffuse>(color3(0.1, 0.2, 0.5));
+	auto materialLeft = std::make_shared<dielectric>(1.5);
+	auto materialRight = std::make_shared<metal>(color3(0.8, 0.6, 0.2), 0.0);
+
+
+	world.add(std::make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, materialGround));
+	world.add(std::make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, materialCenter));
+	world.add(std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, materialLeft));
+	world.add(std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), -0.45, materialLeft));
+	world.add(std::make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, materialRight));
+
+
 
 	// Camera
-	
-	camera mainCamera(90.0, aspectRatio);
+
+	camera mainCamera(point3(-2, 2, 1), point3(0, 0, -1), vec3(0, 1, 0), 20, aspectRatio);
 
 	// Render
 

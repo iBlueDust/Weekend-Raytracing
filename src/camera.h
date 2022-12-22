@@ -6,20 +6,35 @@
 
 class camera {
 public: 
-	camera(double verticalFovInDegrees, double aspectRatio) {
+	camera(
+        point3 lookFrom,
+        point3 lookAt,
+        vec3 worldUp,
+        double verticalFovInDegrees, 
+        double aspectRatio
+    ) {
         auto theta = degreesToRadians(verticalFovInDegrees);
         auto viewportHeight = 2.0 * std::tan(theta / 2.0);
         auto viewportWidth = aspectRatio * viewportHeight;
         auto focalLength = 1.0;
 
-        position = point3(0, 0, 0);
-        horizontal = vec3(viewportWidth, 0.0, 0.0);
-        vertical = vec3(0.0, viewportHeight, 0.0);
-        lowerLeftCorner = position - horizontal / 2 - vertical / 2 - vec3(0, 0, focalLength);
+        auto backward = (lookFrom - lookAt).unit();
+        auto right = worldUp.cross(backward).unit();
+        auto up = backward.cross(right);
+
+        position = lookFrom;
+        horizontal = viewportWidth * right;
+        vertical = viewportHeight * up;
+        lowerLeftCorner = 
+            position - horizontal / 2 - vertical / 2 
+            - backward * focalLength;
 	}
 
-    ray rayFromUV(double u, double v) const {
-        return ray(position, lowerLeftCorner + u * horizontal + v * vertical);
+    ray rayFromUV(double screenU, double screenV) const {
+        return ray(
+            position, 
+            lowerLeftCorner + screenU * horizontal + screenV * vertical - position
+        );
     }
 
 private:
