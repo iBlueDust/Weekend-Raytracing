@@ -23,7 +23,8 @@ color3 rayColor(const hittable_list& world, const ray& r, int maxBounces) {
 	if (maxBounces <= 0)
 		return color3(0);
 	
-	auto hit = world.hit(r, 0.0, INFTY);
+	// 0.001 comes from "8.4 Fixing Shadow Acne"
+	auto hit = world.hit(r, 0.001, INFTY);
 	if (hit.has_value()) {
 		auto record = hit.value();
 		vec3 diffuseDirection = record.normal + vec3::randomInUnitSphere();
