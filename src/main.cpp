@@ -15,6 +15,7 @@
 #include "hittable_list.h"
 #include "material.h"
 #include "ray.h"
+#include "scene.h"
 #include "sphere.h"
 #include "vec3.h"
 
@@ -73,37 +74,11 @@ int main(int argc, char** argv) {
 	const int maxBounces = 50;
 
 	// World
-
-	auto R = std::cos(std::numbers::pi / 4.0);
-	hittable_list world;
-
-	auto materialGround = std::make_shared<lambertian_diffuse>(color3(0.8, 0.8, 0.0));
-	auto materialCenter = std::make_shared<lambertian_diffuse>(color3(0.1, 0.2, 0.5));
-	auto materialLeft = std::make_shared<dielectric>(1.5);
-	auto materialRight = std::make_shared<metal>(color3(0.8, 0.6, 0.2), 0.0);
-
-
-	world.addMany({
-		std::make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, materialGround),
-		std::make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, materialCenter),
-		std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, materialLeft),
-		std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), -0.45, materialLeft),
-		std::make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, materialRight)
-	});
-
+	book_cover_scene masterScene;
+	hittable_list world = masterScene.build();
 
 	// Camera
-	camera_config cameraConfig;
-	cameraConfig.lookFrom             = point3(  3,  3,  2);
-	cameraConfig.lookAt               = point3(  0,  0, -1);
-	cameraConfig.worldUp              = vec3  (  0,  1,  0);
-	cameraConfig.verticalFovInDegrees = 20; // in degrees
-	cameraConfig.aspectRatio          = aspectRatio;
-	cameraConfig.aperture             = 2.0;
-	cameraConfig.focalLength          = 
-		(cameraConfig.lookAt - cameraConfig.lookFrom).magnitude();
-
-	camera mainCamera(cameraConfig);
+	camera mainCamera = masterScene.makeCamera(aspectRatio);
 
 	// Render
 

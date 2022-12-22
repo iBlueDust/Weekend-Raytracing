@@ -82,6 +82,8 @@ public:
 	// Declare static methods (definition below)
 	
 	static vec3 lerp(const vec3& a, const vec3& b, const double t);
+	static vec3 random();
+	static vec3 random(double min, double max);
 	static vec3 randomInUnitSphere();
 	static vec3 randomOnUnitSphere();
 	static vec3 randomInUnitDisk();
@@ -181,13 +183,17 @@ vec3 vec3::lerp(const vec3& a, const vec3& b, const double t) {
 	return (1.0 - t) * a + t * b;
 }
 
+vec3 vec3::random() {
+	return vec3(randomDouble(), randomDouble(), randomDouble());
+}
+
+vec3 vec3::random(double min, double max) {
+	return vec3::random() * (max - min) + vec3(min);
+}
+
 vec3 vec3::randomInUnitSphere() {
 	while (1) {
-		vec3 candidate = vec3(
-			randomDouble(-1.0, 1.0), 
-			randomDouble(-1.0, 1.0), 
-			randomDouble(-1.0, 1.0)
-		);
+		vec3 candidate = vec3::random();
 		if (candidate.squareMagnitude() < 1.0)
 			return candidate;
 	}
