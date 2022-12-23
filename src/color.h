@@ -12,12 +12,10 @@ void writePixel(std::ostream& stream, color3 pixel) {
 	       << static_cast<int>(255.999 * pixel.z) << '\n';
 }
 
-void writePixel(std::ostream& stream, color3 pixel, int sampleCount) {
-	pixel *= 1.0 / sampleCount;
-
-	pixel.x = std::clamp(std::sqrt(pixel.x), 0.0, 1.0);
-	pixel.y = std::clamp(std::sqrt(pixel.y), 0.0, 1.0);
-	pixel.z = std::clamp(std::sqrt(pixel.z), 0.0, 1.0);
-
-	writePixel(stream, pixel);
+color3 gammaCorrect(const color3& pixel) {
+	return color3(
+		std::sqrt(pixel.r),
+		std::sqrt(pixel.g),
+		std::sqrt(pixel.b)
+	);
 }

@@ -82,11 +82,11 @@ public:
 	// Declare static methods (definition below)
 	
 	static vec3 lerp(const vec3& a, const vec3& b, const double t);
-	static vec3 random();
-	static vec3 random(double min, double max);
-	static vec3 randomInUnitSphere();
-	static vec3 randomOnUnitSphere();
-	static vec3 randomInUnitDisk();
+	static vec3 random(random_number_generator& rng);
+	static vec3 random(random_number_generator& rng, double min, double max);
+	static vec3 randomInUnitSphere(random_number_generator& rng);
+	static vec3 randomOnUnitSphere(random_number_generator& rng);
+	static vec3 randomInUnitDisk(random_number_generator& rng);
 
 	void fprint(FILE* stream) {
 		fprintf(stream, "(%.3f, %.3f, %.3f)", x, y, z);
@@ -167,7 +167,7 @@ vec3 vec3::reflect(const vec3& normal) const {
 
 vec3 vec3::refract(const vec3& normal, double iorRatio) const {
 	auto rayIn = this->unit();
-	auto cosTheta = std::min(-rayIn.dot(normal), 1.0);
+	auto cosTheta = std::min<double>(-rayIn.dot(normal), 1.0);
 	vec3 perpendicularComponent = iorRatio * (rayIn + normal * cosTheta);
 	vec3 parallelComponent = 
 		-std::sqrt(
@@ -183,31 +183,31 @@ vec3 vec3::lerp(const vec3& a, const vec3& b, const double t) {
 	return (1.0 - t) * a + t * b;
 }
 
-vec3 vec3::random() {
-	return vec3(randomDouble(), randomDouble(), randomDouble());
+vec3 vec3::random(random_number_generator& rng) {
+	return vec3(rng.randomDouble(), rng.randomDouble(), rng.randomDouble());
 }
 
-vec3 vec3::random(double min, double max) {
-	return vec3::random() * (max - min) + vec3(min);
+vec3 vec3::random(random_number_generator& rng, double min, double max) {
+	return vec3::random(rng) * (max - min) + vec3(min);
 }
 
-vec3 vec3::randomInUnitSphere() {
+vec3 vec3::randomInUnitSphere(random_number_generator& rng) {
 	while (1) {
-		vec3 candidate = vec3::random();
+		vec3 candidate = vec3::random(rng);
 		if (candidate.squareMagnitude() < 1.0)
 			return candidate;
 	}
 }
 
-vec3 vec3::randomOnUnitSphere() {
-	return vec3::randomInUnitSphere().unit();
+vec3 vec3::randomOnUnitSphere(random_number_generator& rng) {
+	return vec3::randomInUnitSphere(rng).unit();
 }
 
-vec3 vec3::randomInUnitDisk() {
+vec3 vec3::randomInUnitDisk(random_number_generator& rng) {
 	while (1) {
 		vec3 candidate = vec3(
-			randomDouble(-1.0, 1.0),
-			randomDouble(-1.0, 1.0),
+			rng.randomDouble(-1.0, 1.0),
+			rng.randomDouble(-1.0, 1.0),
 			0.0
 		);
 		if (candidate.squareMagnitude() < 1.0)

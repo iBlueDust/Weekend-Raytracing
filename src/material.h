@@ -5,6 +5,7 @@
 
 #include "hittable.h"
 #include "ray.h"
+#include "rng.h"
 #include "vec3.h"
 
 struct scatter_result {
@@ -17,7 +18,9 @@ struct hit_record;
 class material {
 public:
 	virtual std::optional<scatter_result> scatter(
-		const ray& rayIn, const hit_record& record
+		const ray& rayIn, 
+		const hit_record& record,
+		random_number_generator& rng
 	) const = 0;
 };
 
@@ -28,9 +31,11 @@ public:
 	lambertian_diffuse(const color3& albedo) : albedo(albedo) {}
 
 	virtual std::optional<scatter_result> scatter(
-		const ray& rayIn, const hit_record& record
-	) const override {
-		auto scatterDirection = record.normal + vec3::randomOnUnitSphere();
+		const ray& rayIn, 
+		const hit_record& record,
+		random_number_generator& rng
+		) const override {
+		auto scatterDirection = record.normal + vec3::randomOnUnitSphere(rng);
 
 		// In case the random vector is almost equal to the opposite of the normal,
 		// scatterDirection can become a zero vector, which is invalid
@@ -54,7 +59,9 @@ public:
 		: albedo(albedo), fuzz(std::clamp(fuzz, 0.0, 1.0)) {}
 
 	virtual std::optional<scatter_result> scatter(
-		const ray& rayIn, const hit_record& record
+		const ray& rayIn, 
+		const hit_record& record,
+		random_number_generator& rng
 	) const override {
 		auto inUnitDirection = rayIn.direction.unit();
 		auto normal = record.normal;
@@ -64,7 +71,7 @@ public:
 		if (reflected.dot(record.normal) <= 0.0)
 			return {};
 
-		auto outDirection = reflected + fuzz * vec3::randomInUnitSphere();
+		auto outDirection = reflected + fuzz * vec3::randomInUnitSphere(rng);
 		auto outRay = ray(record.intersection, outDirection);
 
 		scatter_result result = {
@@ -83,19 +90,21 @@ public:
 	dielectric(double indexOfRefraction) : ior(indexOfRefraction) {}
 
 	virtual std::optional<scatter_result> scatter(
-		const ray& rayIn, const hit_record& record
+		const ray& rayIn, 
+		const hit_record& record, 
+		random_number_generator& rng
 	) const override {
 		// Assumes air has an IOR of 1.000
 		double iorRatio = record.frontFace ? (1.0 / ior) : ior;
 		auto inUnitDirection = rayIn.direction.unit();
-		double cosTheta = std::min(-inUnitDirection.dot(record.normal), 1.0);
+		double cosTheta = std::min<double>(-inUnitDirection.dot(record.normal), 1.0);
 		double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 		
 		bool cantRefract = iorRatio * sinTheta > 1.0;
 		vec3 outDirection;
 
 		// Check for total internal reflection
-		if (cantRefract || reflectance(cosTheta, iorRatio) > randomDouble())
+		if (cantRefract || reflectance(cosTheta, iorRatio) > rng.randomDouble())
 			outDirection = inUnitDirection.reflect(record.normal);
 		else
 			outDirection = inUnitDirection.refract(record.normal, iorRatio);

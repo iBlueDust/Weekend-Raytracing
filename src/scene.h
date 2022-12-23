@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "camera.h"
+#include "commons.h"
 #include "hittable.h"
 #include "hittable_list.h"
 #include "material.h"
@@ -69,22 +70,26 @@ public:
 
         for (int a = -11; a < 11; a++) {
             for (int b = -11; b < 11; b++) {
-                auto chooseMaterial = randomDouble();
-                point3 center(a + 0.9 * randomDouble(), 0.2, b + 0.9 * randomDouble());
+                auto chooseMaterial = globalRng.randomDouble();
+                point3 center(
+                    a + 0.9 * globalRng.randomDouble(), 
+                    0.2, 
+                    b + 0.9 * globalRng.randomDouble()
+                );
 
                 if ((center - point3(4, 0.2, 0)).magnitude() > 0.9) {
                     std::shared_ptr<material> sphereMaterial;
 
                     if (chooseMaterial < 0.8) {
                         // diffuse
-                        auto albedo = color3::random() * color3::random();
+                        auto albedo = color3::random(globalRng) * color3::random(globalRng);
                         sphereMaterial = std::make_shared<lambertian_diffuse>(albedo);
                         world.add(std::make_shared<sphere>(center, 0.2, sphereMaterial));
                     }
                     else if (chooseMaterial < 0.95) {
                         // metal
-                        auto albedo = color3::random(0.5, 1);
-                        auto fuzz = randomDouble(0, 0.5);
+                        auto albedo = color3::random(globalRng, 0.5, 1);
+                        auto fuzz = globalRng.randomDouble(0, 0.5);
                         sphereMaterial = std::make_shared<metal>(albedo, fuzz);
                         world.add(std::make_shared<sphere>(center, 0.2, sphereMaterial));
                     }

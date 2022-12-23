@@ -35,8 +35,10 @@ public:
         lensRadius = config.aperture / 2;
 	}
 
-    ray rayFromUV(double screenU, double screenV) const {
-        vec3 lensPosition = lensRadius * vec3::randomInUnitDisk();
+    ray rayFromUV(
+        double screenU, double screenV, random_number_generator rng
+    ) const {
+        vec3 lensPosition = lensRadius * vec3::randomInUnitDisk(rng);
         vec3 offset = right * lensPosition.x + up * lensPosition.y;
 
         return ray(
