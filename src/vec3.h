@@ -191,27 +191,32 @@ vec3 vec3::random(random_number_generator& rng, double min, double max) {
 	return vec3::random(rng) * (max - min) + vec3(min);
 }
 
+// Read details:
+// http://extremelearning.com.au/how-to-generate-uniformly-random-points-on-n-spheres-and-n-balls/
 vec3 vec3::randomInUnitSphere(random_number_generator& rng) {
-	while (1) {
-		vec3 candidate = vec3::random(rng);
-		if (candidate.squareMagnitude() < 1.0)
-			return candidate;
-	}
+	auto radius = std::cbrt(rng.randomDouble());
+	return radius * vec3::randomOnUnitSphere(rng);
 }
 
 vec3 vec3::randomOnUnitSphere(random_number_generator& rng) {
-	return vec3::randomInUnitSphere(rng).unit();
+	auto cosTheta = 2 * rng.randomDouble() - 1;
+	auto sinTheta = std::sqrt(1 - cosTheta * cosTheta);
+
+	auto phi = rng.randomDouble(0.0, 2 * std::numbers::pi);
+	return vec3(
+		std::cos(phi) * sinTheta, // stops samples from gathering at the poles
+		std::sin(phi) * sinTheta,
+		sinTheta
+	);
 }
 
 vec3 vec3::randomInUnitDisk(random_number_generator& rng) {
-	while (1) {
-		vec3 candidate = vec3(
-			rng.randomDouble(-1.0, 1.0),
-			rng.randomDouble(-1.0, 1.0),
-			0.0
-		);
-		if (candidate.squareMagnitude() < 1.0)
-			return candidate;
-	}
+	auto radius = std::sqrt(rng.randomDouble());
+	auto theta = rng.randomDouble(0.0, 2 * std::numbers::pi);
+	return vec3(
+		radius * std::cos(theta),
+		radius * std::sin(theta),
+		0.0
+	);
 }
 
