@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 	const int maxBounces = 50;
 
 	// World
-	book_cover_scene masterScene;
+	nvidia_scene masterScene;
 	hittable_list world = masterScene.build();
 
 	// Camera
