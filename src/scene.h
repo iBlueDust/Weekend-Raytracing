@@ -130,9 +130,9 @@ public:
 	}
 };
 
-class nvidia_scene : public scene {
+class cornell_box_scene : public scene {
 public:
-	nvidia_scene() {}
+	cornell_box_scene() {}
 
 	virtual hittable_list build() override {
 		hittable_list world;
