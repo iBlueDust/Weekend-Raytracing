@@ -63,10 +63,8 @@ public:
 		if (!aabb.contains(ray))
 			return {};
 
-		bool hit = false;
 		HitRecord record;
-		// extra parenthesis to avoid namespace clash with max()
-		record.t = std::numeric_limits<double>::infinity(); 
+		record.t = tMax; 
 
 		// find closest intersection
 		for (int i = 0; i <= (indices.size() - 1) / 3; i++) {
@@ -81,7 +79,7 @@ public:
 
 			// Skip if intersection is behind the ray or we've found a closer
 			// one.
-			if (t < 0 || t >= record.t)
+			if (t < tMin || t >= record.t)
 				continue;
 
 			auto intersection = ray.at(t);
@@ -95,14 +93,14 @@ public:
 			record.materialPtr = materialPtrs[
 				i < materialIndices.size() ? materialIndices[i] : 0
 			];
-			hit = true;
 		}
 
+		// also allows us to not check whether t < tMax inside the for loop
+		bool hit = record.t < tMax;
 		if (!hit)
 			return {};
 
-		record.normal = record.normal.unit();
-		record.setNormalFromOutwardNormal(ray, record.normal);
+		record.setNormalFromOutwardNormal(ray, record.normal.unit());
 		return record;
 	}
 
@@ -131,6 +129,8 @@ private:
 			auto BC = c - b;
 			auto CA = a - c;
 
+			// Seems to need a floating point buffer region for edgecases
+			// where point is right on AB, BC, or CA
 			bool rightOfAB = std::signbit(AB.cross(normal).dot(point - a));
 			bool rightOfBC = std::signbit(BC.cross(normal).dot(point - b));
 			bool rightOfCA = std::signbit(CA.cross(normal).dot(point - c));

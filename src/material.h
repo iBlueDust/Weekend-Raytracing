@@ -38,7 +38,7 @@ public:
 		const Ray& rayIn, 
 		const HitRecord& record,
 		RandomNumberGenerator& rng
-		) const override {
+	) const override {
 		auto scatterDirection = record.normal + vec3::randomOnUnitSphere(rng);
 
 		// In case the random vector is almost equal to the opposite of the normal,
@@ -68,8 +68,7 @@ public:
 		RandomNumberGenerator& rng
 	) const override {
 		auto inUnitDirection = rayIn.direction.unit();
-		auto normal = record.normal;
-		vec3 reflected = inUnitDirection.reflect(normal);
+		vec3 reflected = inUnitDirection.reflect(record.normal);
 
 		// If ray is coming from inside somehow
 		if (reflected.dot(record.normal) <= 0.0)
