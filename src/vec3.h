@@ -161,8 +161,8 @@ inline bool vec3::nearZero() const {
 }
 
 vec3 vec3::reflect(const vec3& normal) const {
-	auto rayIn = this->unit();
-	return rayIn - 2 * rayIn.dot(normal) * normal;
+	auto unitNormal = normal.unit();
+	return *this - 2 * this->dot(unitNormal) * unitNormal;
 }
 
 vec3 vec3::refract(const vec3& normal, double iorRatio) const {
@@ -201,7 +201,7 @@ vec3 vec3::randomInUnitSphere(RandomNumberGenerator& rng) {
 vec3 vec3::randomOnUnitSphere(RandomNumberGenerator& rng) {
 	auto cosTheta = rng.randomDouble(-1.0, 1.0);
 	auto sinTheta = std::sqrt(1 - cosTheta * cosTheta);
-
+	
 	auto phi = rng.randomDouble(0.0, 2 * std::numbers::pi);
 	return vec3(
 		std::cos(phi) * sinTheta, // stops samples from gathering at the poles
