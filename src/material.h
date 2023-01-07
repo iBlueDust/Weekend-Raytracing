@@ -8,32 +8,32 @@
 #include "rng.h"
 #include "vec3.h"
 
-struct scatter_result {
-	ray outRay;
+struct ScatterResult {
+	Ray outRay;
 	color3 attenuation;
 };
 
-struct hit_record;
+struct HitRecord;
 
-class material {
+class Material {
 public:
-	virtual std::optional<scatter_result> scatter(
-		const ray& rayIn, 
-		const hit_record& record,
-		random_number_generator& rng
+	virtual std::optional<ScatterResult> scatter(
+		const Ray& rayIn, 
+		const HitRecord& record,
+		RandomNumberGenerator& rng
 	) const = 0;
 };
 
-class lambertian_diffuse : public material {
+class LambertianDiffuse : public Material {
 public:
 	color3 albedo;
 
-	lambertian_diffuse(const color3& albedo) : albedo(albedo) {}
+	LambertianDiffuse(const color3& albedo) : albedo(albedo) {}
 
-	virtual std::optional<scatter_result> scatter(
-		const ray& rayIn, 
-		const hit_record& record,
-		random_number_generator& rng
+	virtual std::optional<ScatterResult> scatter(
+		const Ray& rayIn, 
+		const HitRecord& record,
+		RandomNumberGenerator& rng
 		) const override {
 		auto scatterDirection = record.normal + vec3::randomOnUnitSphere(rng);
 
@@ -42,26 +42,26 @@ public:
 		if (scatterDirection.nearZero())
 			scatterDirection = record.normal;
 
-		scatter_result result = {
-			/* outRay */      ray(record.intersection, scatterDirection),
+		ScatterResult result = {
+			/* outRay */      Ray(record.intersection, scatterDirection),
 			/* attenuation */ albedo
 		};
 		return std::optional(result);
 	}
 };
 
-class metal : public material {
+class Metal : public Material {
 public:
 	color3 albedo;
 	double fuzz;
 
-	metal(const color3& albedo, double fuzz)
+	Metal(const color3& albedo, double fuzz)
 		: albedo(albedo), fuzz(std::clamp(fuzz, 0.0, 1.0)) {}
 
-	virtual std::optional<scatter_result> scatter(
-		const ray& rayIn, 
-		const hit_record& record,
-		random_number_generator& rng
+	virtual std::optional<ScatterResult> scatter(
+		const Ray& rayIn, 
+		const HitRecord& record,
+		RandomNumberGenerator& rng
 	) const override {
 		auto inUnitDirection = rayIn.direction.unit();
 		auto normal = record.normal;
@@ -72,9 +72,9 @@ public:
 			return {};
 
 		auto outDirection = reflected + fuzz * vec3::randomInUnitSphere(rng);
-		auto outRay = ray(record.intersection, outDirection);
+		auto outRay = Ray(record.intersection, outDirection);
 
-		scatter_result result = {
+		ScatterResult result = {
 			/* outRay */      outRay,
 			/* attenuation */ albedo
 		};
@@ -83,16 +83,16 @@ public:
 };
 
 // Material that always refracts light
-class dielectric : public material {
+class Dielectric : public Material {
 public:
 	double ior;
 
-	dielectric(double indexOfRefraction) : ior(indexOfRefraction) {}
+	Dielectric(double indexOfRefraction) : ior(indexOfRefraction) {}
 
-	virtual std::optional<scatter_result> scatter(
-		const ray& rayIn, 
-		const hit_record& record, 
-		random_number_generator& rng
+	virtual std::optional<ScatterResult> scatter(
+		const Ray& rayIn, 
+		const HitRecord& record, 
+		RandomNumberGenerator& rng
 	) const override {
 		// Assumes air has an IOR of 1.000
 		double iorRatio = record.frontFace ? (1.0 / ior) : ior;
@@ -109,8 +109,8 @@ public:
 		else
 			outDirection = inUnitDirection.refract(record.normal, iorRatio);
 
-		scatter_result result = {
-			/* outRay */      ray(record.intersection, outDirection),
+		ScatterResult result = {
+			/* outRay */      Ray(record.intersection, outDirection),
 			/* attenuation */ color3(1.0) // Always white
 		};
 		return std::optional(result);

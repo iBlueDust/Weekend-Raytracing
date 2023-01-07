@@ -24,10 +24,10 @@
 
 
 color3 rayColor(
-	const hittable_list& world, 
-	const ray& ray, 
+	const HittableList& world, 
+	const Ray& ray, 
 	const int maxBounces, 
-	random_number_generator& rng
+	RandomNumberGenerator& rng
 ) {
 	constexpr double INFTY = std::numeric_limits<double>::infinity();
 	constexpr double absorption = 0.5;
@@ -60,12 +60,12 @@ void render(
 	const int sampleCount,
 	const int seed,
 	const int maxBounces,
-	const hittable_list& world,
-	const camera& camera,
+	const HittableList& world,
+	const Camera& camera,
 	std::vector<color3>& image,
 	int& scanlinesDone
 ) {
-	random_number_generator rng(seed);
+	RandomNumberGenerator rng(seed);
 	scanlinesDone = 0;
 
 	// Origin is at the bottom left corner
@@ -80,7 +80,7 @@ void render(
 				auto u = double(column + rng.randomDouble()) / (width - 1);
 				auto v = double(row + rng.randomDouble()) / (height - 1);
 
-				ray ray = camera.rayFromUV(u, v, rng);
+				Ray ray = camera.rayFromUV(u, v, rng);
 				pixel += rayColor(world, ray, maxBounces, rng);
 			}
 			image[j * width + i] = pixel / sampleCount;
@@ -120,10 +120,10 @@ int main(int argc, char** argv) {
 
 	// World
 	cornell_box_scene masterScene;
-	hittable_list world = masterScene.build();
+	HittableList world = masterScene.build();
 
 	// Camera
-	camera mainCamera = masterScene.makeCamera(aspectRatio);
+	Camera mainCamera = masterScene.makeCamera(aspectRatio);
 
 	// Render
 	const auto threadCount = std::max<unsigned int>(std::thread::hardware_concurrency(), 1);

@@ -4,15 +4,15 @@
 #include "vec3.h"
 
 // Axis-Aligned Bounding Box (AABB)
-class bounding_box {
+class BoundingBox {
 private:
-	class rectangle {
+	class Rectangle {
 	public:
 		double xMin, yMin;
 		double xMax, yMax;
 
-		rectangle() {}
-		rectangle(
+		Rectangle() {}
+		Rectangle(
 			double xMin, double yMin, double xMax, double yMax
 		) : xMin(xMin), yMin(yMin), xMax(xMax), yMax(yMax) {}
 
@@ -22,26 +22,26 @@ private:
 		}
 	};
 
-	enum axes {
-		x = 0,
-		y = 1,
-		z = 2
+	enum Axis {
+		X = 0,
+		Y = 1,
+		Z = 2
 	};
 
-	std::pair<axes, axes> axesPerpendicularTo(axes axis) const {
-		constexpr std::pair<axes, axes> table[3] = {
-			{ axes::y, axes::z },
-			{ axes::x, axes::z },
-			{ axes::x, axes::y },
+	std::pair<Axis, Axis> axesPerpendicularTo(Axis axis) const {
+		constexpr std::pair<Axis, Axis> table[3] = {
+			{ Axis::Y, Axis::Z },
+			{ Axis::X, Axis::Z },
+			{ Axis::X, Axis::Y },
 		};
 
 		return table[axis];
 	};
 
 	bool doesRayIntersectAxisAlignedRectangle(
-		const ray& ray,
-		axes axis,
-		const rectangle& rectangle,
+		const Ray& ray,
+		Axis axis,
+		const Rectangle& rectangle,
 		double rectanglePosition
 	) const {
 		double origin = ray.origin.elements[axis];
@@ -62,8 +62,8 @@ private:
 	}
 
 public:
-	bounding_box() : cornerMin(0), cornerMax(0) {}
-	bounding_box(point3 corner1, point3 corner2) :
+	BoundingBox() : cornerMin(0), cornerMax(0) {}
+	BoundingBox(point3 corner1, point3 corner2) :
 		cornerMin(
 			std::min<double>(corner1.x, corner2.x),
 			std::min<double>(corner1.y, corner2.y),
@@ -81,17 +81,17 @@ public:
 			&& cornerMin.z <= point.z && cornerMax.z >= point.z;
 	}
 
-	bool contains(const ray& ray) const {
+	bool contains(const Ray& ray) const {
 		// xRectangle means it is perpendicular to the x axis, and so forth
-		auto xRectangle = rectangle(cornerMin.y, cornerMin.z, cornerMax.y, cornerMax.z);
-		auto yRectangle = rectangle(cornerMin.x, cornerMin.z, cornerMax.x, cornerMax.z);
-		auto zRectangle = rectangle(cornerMin.x, cornerMin.y, cornerMax.x, cornerMax.y);
-		return doesRayIntersectAxisAlignedRectangle(ray, axes::x, xRectangle, cornerMin.x)
-			|| doesRayIntersectAxisAlignedRectangle(ray, axes::x, xRectangle, cornerMax.x)
-			|| doesRayIntersectAxisAlignedRectangle(ray, axes::y, yRectangle, cornerMin.y)
-			|| doesRayIntersectAxisAlignedRectangle(ray, axes::y, yRectangle, cornerMax.y)
-			|| doesRayIntersectAxisAlignedRectangle(ray, axes::z, zRectangle, cornerMin.z)
-			|| doesRayIntersectAxisAlignedRectangle(ray, axes::z, zRectangle, cornerMax.z);
+		auto xRectangle = Rectangle(cornerMin.y, cornerMin.z, cornerMax.y, cornerMax.z);
+		auto yRectangle = Rectangle(cornerMin.x, cornerMin.z, cornerMax.x, cornerMax.z);
+		auto zRectangle = Rectangle(cornerMin.x, cornerMin.y, cornerMax.x, cornerMax.y);
+		return doesRayIntersectAxisAlignedRectangle(ray, Axis::X, xRectangle, cornerMin.x)
+			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::X, xRectangle, cornerMax.x)
+			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::Y, yRectangle, cornerMin.y)
+			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::Y, yRectangle, cornerMax.y)
+			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::Z, zRectangle, cornerMin.z)
+			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::Z, zRectangle, cornerMax.z);
 	}
 
 	void include(const point3& point) {

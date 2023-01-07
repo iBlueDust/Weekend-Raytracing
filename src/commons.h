@@ -5,7 +5,7 @@
 
 #include "rng.h"
 
-random_number_generator globalRng;
+RandomNumberGenerator globalRng;
 
 inline double degreesToRadians(double degrees) {
 	return degrees * std::numbers::pi / 180.0;

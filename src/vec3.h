@@ -82,11 +82,11 @@ public:
 	// Declare static methods (definition below)
 	
 	static vec3 lerp(const vec3& a, const vec3& b, const double t);
-	static vec3 random(random_number_generator& rng);
-	static vec3 random(random_number_generator& rng, double min, double max);
-	static vec3 randomInUnitSphere(random_number_generator& rng);
-	static vec3 randomOnUnitSphere(random_number_generator& rng);
-	static vec3 randomInUnitDisk(random_number_generator& rng);
+	static vec3 random(RandomNumberGenerator& rng);
+	static vec3 random(RandomNumberGenerator& rng, double min, double max);
+	static vec3 randomInUnitSphere(RandomNumberGenerator& rng);
+	static vec3 randomOnUnitSphere(RandomNumberGenerator& rng);
+	static vec3 randomInUnitDisk(RandomNumberGenerator& rng);
 
 	void fprint(FILE* stream) {
 		fprintf(stream, "(%.3f, %.3f, %.3f)", x, y, z);
@@ -183,22 +183,22 @@ vec3 vec3::lerp(const vec3& a, const vec3& b, const double t) {
 	return (1.0 - t) * a + t * b;
 }
 
-vec3 vec3::random(random_number_generator& rng) {
+vec3 vec3::random(RandomNumberGenerator& rng) {
 	return vec3(rng.randomDouble(), rng.randomDouble(), rng.randomDouble());
 }
 
-vec3 vec3::random(random_number_generator& rng, double min, double max) {
+vec3 vec3::random(RandomNumberGenerator& rng, double min, double max) {
 	return vec3::random(rng) * (max - min) + vec3(min);
 }
 
 // Read details:
 // http://extremelearning.com.au/how-to-generate-uniformly-random-points-on-n-spheres-and-n-balls/
-vec3 vec3::randomInUnitSphere(random_number_generator& rng) {
+vec3 vec3::randomInUnitSphere(RandomNumberGenerator& rng) {
 	auto radius = std::cbrt(rng.randomDouble());
 	return radius * vec3::randomOnUnitSphere(rng);
 }
 
-vec3 vec3::randomOnUnitSphere(random_number_generator& rng) {
+vec3 vec3::randomOnUnitSphere(RandomNumberGenerator& rng) {
 	auto cosTheta = 2 * rng.randomDouble() - 1;
 	auto sinTheta = std::sqrt(1 - cosTheta * cosTheta);
 
@@ -210,7 +210,7 @@ vec3 vec3::randomOnUnitSphere(random_number_generator& rng) {
 	);
 }
 
-vec3 vec3::randomInUnitDisk(random_number_generator& rng) {
+vec3 vec3::randomInUnitDisk(RandomNumberGenerator& rng) {
 	auto radius = std::sqrt(rng.randomDouble());
 	auto theta = rng.randomDouble(0.0, 2 * std::numbers::pi);
 	return vec3(

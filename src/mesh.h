@@ -11,33 +11,29 @@
 #include "material.h"
 #include "vec3.h"
 
-struct triangle {
-	point3 a, b, c;
-};
-
-class mesh : public hittable {
+class Mesh : public Hittable {
 private:
 	std::vector<point3> vertices;
 	std::vector<int> indices;
-	std::vector<std::shared_ptr<material>> materialPtrs;
+	std::vector<std::shared_ptr<Material>> materialPtrs;
 	std::vector<int> materialIndices;
 
-	bounding_box aabb; // Axis Aligned Bounding Box
+	BoundingBox aabb; // Axis Aligned Bounding Box
 
 public: 
 
-	mesh() {}
+	Mesh() {}
 	
-	mesh(
+	Mesh(
 		std::initializer_list<point3> vertices,
 		std::initializer_list<int> indices,
-		std::shared_ptr<material> materialPtr
-	) : mesh(vertices, indices, { materialPtr }, {}) {}
+		std::shared_ptr<Material> materialPtr
+	) : Mesh(vertices, indices, { materialPtr }, {}) {}
 
-	mesh(
+	Mesh(
 		std::initializer_list<point3> vertices,
 		std::initializer_list<int> indices,
-		std::initializer_list<std::shared_ptr<material>> materialPtrs,
+		std::initializer_list<std::shared_ptr<Material>> materialPtrs,
 		std::initializer_list<int> materialIndices
 	) :
 		vertices(vertices),
@@ -60,22 +56,22 @@ public:
 			aabb.include(vertex);		
 	}
 
-	virtual std::optional<hit_record> hit(
-		const ray& ray,
+	virtual std::optional<HitRecord> hit(
+		const Ray& ray,
 		double tMin, double tMax
 	) const {
 		if (!aabb.contains(ray))
 			return {};
 
 		bool hit = false;
-		hit_record record;
+		HitRecord record;
 		// extra parenthesis to avoid namespace clash with max()
 		record.t = std::numeric_limits<double>::infinity(); 
 
 		// find closest intersection
 		for (int i = 0; i <= (indices.size() - 1) / 3; i++) {
 			int triangleIndex = i * 3;
-			triangle triangle(
+			Triangle triangle(
 				vertices[indices[triangleIndex]],
 				vertices[indices[triangleIndex + 1]],
 				vertices[indices[triangleIndex + 2]]
@@ -112,17 +108,17 @@ public:
 
 private:
 	// Triangle in 3D space
-	class triangle {
+	class Triangle {
 	public:
 		const point3 a, b, c;
 		const vec3 normal;
 
-		triangle(point3 a, point3 b, point3 c)
+		Triangle(point3 a, point3 b, point3 c)
 			: a(a), b(b), c(c), normal((b - a).cross(c - a)) { }
 
 		// Returns a value t where ray.at(t) is the intersection of the plane 
 		// and the ray
-		double hitPlane(const ray& ray) const {
+		double hitPlane(const Ray& ray) const {
 			double D = a.dot(normal); // From the plane equation Ax + By + Cz = D
 			double t = (D - normal.dot(ray.origin)) / normal.dot(ray.direction);
 			return t;

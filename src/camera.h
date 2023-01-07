@@ -4,7 +4,7 @@
 #include "ray.h"
 #include "vec3.h"
 
-struct camera_config {
+struct CameraConfig {
     point3 lookFrom;
     point3 lookAt;
     vec3 worldUp;
@@ -14,9 +14,9 @@ struct camera_config {
     double focalLength;
 };
 
-class camera {
+class Camera {
 public: 
-	camera(camera_config config) {
+	Camera(CameraConfig config) {
         auto theta = degreesToRadians(config.verticalFovInDegrees);
         auto viewportHeight = 2.0 * std::tan(theta / 2.0);
         auto viewportWidth = config.aspectRatio * viewportHeight;
@@ -35,13 +35,13 @@ public:
         lensRadius = config.aperture / 2;
 	}
 
-    ray rayFromUV(
-        double screenU, double screenV, random_number_generator rng
+    Ray rayFromUV(
+        double screenU, double screenV, RandomNumberGenerator rng
     ) const {
         vec3 lensPosition = lensRadius * vec3::randomInUnitDisk(rng);
         vec3 offset = right * lensPosition.x + up * lensPosition.y;
 
-        return ray(
+        return Ray(
             position + offset, 
             lowerLeftCorner
             + screenU * horizontal 

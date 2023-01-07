@@ -7,16 +7,16 @@
 #include "hittable.h"
 
 
-class hittable_list : public hittable {
+class HittableList : public Hittable {
 public:
-	std::vector<std::shared_ptr<hittable>> hittables;
+	std::vector<std::shared_ptr<Hittable>> hittables;
 
-	hittable_list() {}
-	hittable_list(std::initializer_list<std::shared_ptr<hittable>> hittables) { 
+	HittableList() {}
+	HittableList(std::initializer_list<std::shared_ptr<Hittable>> hittables) { 
 		addMany(hittables);
 	}
 
-	void add(std::shared_ptr<hittable> hittable) {
+	void add(std::shared_ptr<Hittable> hittable) {
 		hittables.push_back(hittable);
 	}
 
@@ -25,7 +25,7 @@ public:
 		hittables.insert(hittables.end(), start, end);
 	}
 
-	void addMany(const std::initializer_list<std::shared_ptr<hittable>> newHittables) {
+	void addMany(const std::initializer_list<std::shared_ptr<Hittable>> newHittables) {
 		hittables.insert(hittables.end(), newHittables.begin(), newHittables.end());
 	}
 
@@ -33,14 +33,14 @@ public:
 		hittables.clear();
 	}
 
-	virtual std::optional<hit_record> hit(const ray& ray, double tMin, double tMax) const override;
+	virtual std::optional<HitRecord> hit(const Ray& ray, double tMin, double tMax) const override;
 };
 
-std::optional<hit_record> hittable_list::hit(const ray& ray, double tMin, double tMax) const {
+std::optional<HitRecord> HittableList::hit(const Ray& ray, double tMin, double tMax) const {
 	// minimum parametric value t corresponds to the closest hittable
 	// (disregarding those behind the ray)
 	double minT = tMax;
-	std::optional<hit_record> closestHit = {};
+	std::optional<HitRecord> closestHit = {};
 
 	for (const auto& hittable : hittables) {
 		auto hit = hittable->hit(ray, tMin, tMax);
@@ -50,7 +50,7 @@ std::optional<hit_record> hittable_list::hit(const ray& ray, double tMin, double
 		auto record = hit.value();
 		if (!closestHit || minT > record.t) {
 			minT = record.t;
-			closestHit = std::optional<hit_record>(hit);
+			closestHit = std::optional<HitRecord>(hit);
 		}
 	}
 

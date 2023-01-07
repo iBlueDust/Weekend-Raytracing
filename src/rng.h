@@ -2,10 +2,10 @@
 
 #include <random>
 
-class random_number_generator {
+class RandomNumberGenerator {
 public:
-	random_number_generator() : distribution(0.0, 1.0) {}
-	random_number_generator(int seed) : distribution(0.0, 1.0), engine(seed) {}
+	RandomNumberGenerator() : distribution(0.0, 1.0) {}
+	RandomNumberGenerator(int seed) : distribution(0.0, 1.0), engine(seed) {}
 
 	double randomDouble() {
 		return distribution(engine);

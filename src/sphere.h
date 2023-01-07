@@ -7,20 +7,20 @@
 #include "vec3.h"
 
 
-class sphere : public hittable {
+class Sphere : public Hittable {
 public:
 	point3 center;
 	double radius;
-	std::shared_ptr<material> materialPtr;
+	std::shared_ptr<Material> materialPtr;
 
-	sphere() {}
-	sphere(point3 center, double radius, std::shared_ptr<material> materialPtr) 
+	Sphere() {}
+	Sphere(point3 center, double radius, std::shared_ptr<Material> materialPtr) 
 		: center(center), radius(radius), materialPtr(materialPtr) {}
 
-	virtual std::optional<hit_record> hit(const ray& ray, double tMin, double tMax) const override;
+	virtual std::optional<HitRecord> hit(const Ray& ray, double tMin, double tMax) const override;
 };
 
-std::optional<hit_record> sphere::hit(const ray& ray, double tMin, double tMax) const {
+std::optional<HitRecord> Sphere::hit(const Ray& ray, double tMin, double tMax) const {
 	auto deltaCenter = ray.origin - center;
 
 	// Setup quadratic equation
@@ -42,7 +42,7 @@ std::optional<hit_record> sphere::hit(const ray& ray, double tMin, double tMax) 
 		}
 	}	
 
-	hit_record result;
+	HitRecord result;
 	result.intersection = ray.at(t);
 	result.t = t;
 	auto outwardNormal = (result.intersection - center) / radius;
