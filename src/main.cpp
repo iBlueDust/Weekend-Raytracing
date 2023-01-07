@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
 	const int imageWidth = 400;
 	const int imageHeight = static_cast<int>(imageWidth / aspectRatio);
 	const int sampleCount = 100;
-	const int maxBounces = 5;
+	const int maxBounces = 50;
 
 	// World
 	cornell_box_scene masterScene;
@@ -126,7 +126,11 @@ int main(int argc, char** argv) {
 	Camera mainCamera = masterScene.makeCamera(aspectRatio);
 
 	// Render
-	const auto threadCount = std::max<unsigned int>(std::thread::hardware_concurrency(), 1);
+#ifdef NDEBUG
+	const unsigned int threadCount = std::max<unsigned int>(std::thread::hardware_concurrency(), 1);
+#else
+	const unsigned int threadCount = 1u;
+#endif
 
 	std::vector<std::thread> threads;
 	std::vector<int> scanlinesDoneByThread(threadCount, 0);
