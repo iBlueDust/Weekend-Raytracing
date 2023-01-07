@@ -163,6 +163,7 @@ public:
 					0, 3, 6, 0, 6, 4, // front face (behind camera)
 
 					// top face
+					8, 9, 10, 10, 9, 11, // center panel
 					7, 5, 11, 11, 5, 9,  // front eave
 					10, 6, 7, 10, 7, 11, // left eave
 					5, 4, 9, 9, 4, 8,    // right eave
@@ -171,12 +172,19 @@ public:
 				std::initializer_list<std::shared_ptr<Material>> {
 					std::make_shared<LambertianDiffuse>(color3(1)),
 					std::make_shared<LambertianDiffuse>(color3(1, 0, 0)),
-					std::make_shared<LambertianDiffuse>(color3(0, 1, 0))
+					std::make_shared<LambertianDiffuse>(color3(0, 1, 0)),
+					std::make_shared<DiffuseLight>(color3(1))
 					},
 				std::initializer_list<int> {
 					0, 0, // bottom face
 					1, 1, // left face
 					2, 2, // right face
+					0, 0, // back face
+					0, 0, // front face
+
+					// top face
+					3, 3, // center panel
+
 					0 // everything else
 				}
 			),

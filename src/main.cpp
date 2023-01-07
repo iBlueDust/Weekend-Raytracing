@@ -25,6 +25,7 @@
 
 color3 rayColor(
 	const HittableList& world, 
+	const color3& background,
 	const Ray& ray, 
 	const int maxBounces, 
 	RandomNumberGenerator& rng
@@ -37,21 +38,20 @@ color3 rayColor(
 
 	// 0.001 comes from "8.4 Fixing Shadow Acne"
 	auto hit = world.hit(ray, 0.001, INFTY);
-	if (hit) {
-		auto record = hit.value();
-		auto scattered = record.materialPtr->scatter(ray, record, rng);
-		if (scattered) {
-			auto scatterResult = scattered.value();
-			return scatterResult.attenuation
-				* rayColor(world, scatterResult.outRay, maxBounces - 1, rng);
-		}
+	if (!hit)
+		return background;
 
-		return color3(0);
-	}
+	auto record = hit.value();
+	auto scattered = record.materialPtr->scatter(ray, record, rng);
+	color3 emitted = record.materialPtr->emit();
 
-	vec3 unitDirection = ray.direction.unit();
-	auto t = 0.5 * (unitDirection.y + 1.0);
-	return vec3::lerp(color3(1.0), color3(0.5, 0.7, 1.0), t);
+	if (!scattered)
+		return emitted;
+
+	auto scatterResult = scattered.value();
+	return emitted + 
+		scatterResult.attenuation
+		* rayColor(world, background, scatterResult.outRay, maxBounces - 1, rng);
 }
 
 void render(
@@ -81,7 +81,7 @@ void render(
 				auto v = double(row + rng.randomDouble()) / (height - 1);
 
 				Ray ray = camera.rayFromUV(u, v, rng);
-				pixel += rayColor(world, ray, maxBounces, rng);
+				pixel += rayColor(world, color3(0), ray, maxBounces, rng);
 			}
 			image[j * width + i] = pixel / sampleCount;
 		}
@@ -112,11 +112,11 @@ int main(int argc, char** argv) {
 
 	// Image
 
-	const double aspectRatio = 16.0 / 9.0;
+	const double aspectRatio = 1.0;
 	const int imageWidth = 400;
 	const int imageHeight = static_cast<int>(imageWidth / aspectRatio);
 	const int sampleCount = 100;
-	const int maxBounces = 50;
+	const int maxBounces = 5;
 
 	// World
 	cornell_box_scene masterScene;

@@ -22,6 +22,10 @@ public:
 		const HitRecord& record,
 		RandomNumberGenerator& rng
 	) const = 0;
+
+	virtual color3 emit() {
+		return color3(0); // black default
+	}
 };
 
 class LambertianDiffuse : public Material {
@@ -124,3 +128,24 @@ private:
 		return r0 + (1.0 - r0) * std::pow(1 - cosTheta, 5);
 	}
 };
+
+class DiffuseLight : public Material {
+public:
+	color3 color;
+
+	DiffuseLight(color3 color) : color(color) {}
+
+	virtual std::optional<ScatterResult> scatter(
+		const Ray& rayIn,
+		const HitRecord& record,
+		RandomNumberGenerator& rng
+	) const override {
+		return {}; // No bounces
+	}
+
+	virtual color3 emit() {
+		return color;
+	}
+
+};
+
