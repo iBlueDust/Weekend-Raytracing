@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
 				imageWidth,
 				imageHeight,
 				threadSampleCount,
-				seed,
+				seed + i,
 				maxBounces,
 				std::ref(world),
 				std::ref(mainCamera),
