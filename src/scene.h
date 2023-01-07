@@ -140,54 +140,54 @@ public:
 		world.addMany({
 			std::make_shared<Mesh>(
 				std::initializer_list<point3>{
-					point3(-1, -1, -2),    // 0
-					point3(-1, -1, 1),     // 1
-					point3(1, -1, 1),      // 2
-					point3(1, -1, -2),     // 3
+					point3(-1, -1, -2),      // 0
+					point3(-1, -1, 1),       // 1
+					point3(1, -1, 1),        // 2
+					point3(1, -1, -2),       // 3
 
-					point3(-1, 1, -2),     // 4
-					point3(-1, 1, 1),      // 5
-					point3(1, 1, -2),      // 6
-					point3(1, 1, 1),       // 7
+					point3(-1, 1, -2),       // 4
+					point3(-1, 1, 1),        // 5
+					point3(1, 1, 1),         // 6
+					point3(1, 1, -2),        // 7
 
-					point3(-0.5, 1, -0.5), // 8
-					point3(-0.5, 1, 0.5),  // 9
-					point3(0.5, 1, -0.5),  // 10
-					point3(0.5, 1, 0.5)    // 11
+					point3(-0.25, 1, -0.25), // 8
+					point3(-0.25, 1, 0.25),  // 9
+					point3(0.25, 1, 0.25),   // 10
+					point3(0.25, 1, -0.25)   // 11
 				},
 				std::initializer_list<int>{
-					0, 1, 2, 0, 2, 3, // bottom face
-					2, 3, 7, 3, 7, 6, // left face
-					5, 4, 1, 1, 0, 4, // right face
-					1, 2, 7, 1, 7, 5, // back face
-					0, 3, 6, 0, 6, 4, // front face (behind camera)
+					2, 1, 0, 3, 2, 0, // bottom face
+					1, 5, 4, 0, 1, 4, // left face
+					2, 3, 6, 7, 6, 3, // right face
+					6, 5, 1, 6, 1, 2, // back face
+					4, 3, 0, 7, 3, 4, // front face (behind camera)
 
 					// top face
-					8, 9, 10, 10, 9, 11, // center panel
-					7, 5, 11, 11, 5, 9,  // front eave
-					10, 6, 7, 10, 7, 11, // left eave
-					5, 4, 9, 9, 4, 8,    // right eave
-					4, 6, 8, 8, 6, 10    // back eave 
+					8, 9, 10, 10, 11, 8, // center panel
+					8, 7, 4, 7, 8, 11,   // front eave
+					4, 5, 9, 9, 8, 4,    // left eave
+					6, 7, 11, 6, 11, 10, // right eave
+					5, 6, 10, 10, 9, 5   // back eave 
 				},
 				std::initializer_list<std::shared_ptr<Material>> {
-					std::make_shared<LambertianDiffuse>(color3(1)),
+					std::make_shared<LambertianDiffuse>(color3(0.73)),
 					std::make_shared<LambertianDiffuse>(color3(1, 0, 0)),
 					std::make_shared<LambertianDiffuse>(color3(0, 1, 0)),
-					std::make_shared<DiffuseLight>(color3(1))
-					},
+					std::make_shared<DiffuseLight>(color3(1) * 15.0)
+				},
 				std::initializer_list<int> {
 					0, 0, // bottom face
 					1, 1, // left face
 					2, 2, // right face
 					0, 0, // back face
 					0, 0, // front face
-
+					
 					// top face
 					3, 3, // center panel
-
 					0 // everything else
 				}
 			),
+
 			std::make_shared<Sphere>(
 				point3(-0.5, -0.65, 0.1),
 				0.35,
@@ -202,7 +202,7 @@ public:
 				point3(0, -0.6, -0.2),
 				0.4,
 				std::make_shared<Dielectric>(1.250)
-			),
+			)
 		});
 
 		return world;
@@ -211,7 +211,7 @@ public:
 	virtual Camera makeCamera(double aspectRatio) {
 		CameraConfig cameraConfig;
 		cameraConfig.lookFrom = point3(0, 0, -1.95);
-		cameraConfig.lookAt = point3(0, 0, 1);
+		cameraConfig.lookAt = point3(0, 0, 0);
 		cameraConfig.worldUp = vec3(0, 1, 0);
 		cameraConfig.verticalFovInDegrees = 85; // in degrees
 		cameraConfig.aspectRatio = aspectRatio;
