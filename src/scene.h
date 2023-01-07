@@ -140,14 +140,14 @@ public:
 		world.add(
 			std::make_shared<mesh>(
 				std::initializer_list<point3>{
-					point3(-1, -1, -1),    // 0
+					point3(-1, -1, -2),    // 0
 					point3(-1, -1, 1),     // 1
 					point3(1, -1, 1),      // 2
-					point3(1, -1, -1),     // 3
+					point3(1, -1, -2),     // 3
 										   
-					point3(-1, 1, -1),     // 4
+					point3(-1, 1, -2),     // 4
 					point3(-1, 1, 1),      // 5
-					point3(1, 1, -1),      // 6
+					point3(1, 1, -2),      // 6
 					point3(1, 1, 1),       // 7
 										   
 					point3(-0.5, 1, -0.5), // 8
@@ -168,7 +168,17 @@ public:
 					5, 4, 9, 9, 4, 8,    // right eave
 					4, 6, 8, 8, 6, 10    // back eave 
 				},
-				std::make_shared<lambertian_diffuse>(color3(0.9))
+				std::initializer_list<std::shared_ptr<material>> {
+					std::make_shared<lambertian_diffuse>(color3(0.9)),
+					std::make_shared<lambertian_diffuse>(color3(0.9, 0, 0)),
+					std::make_shared<lambertian_diffuse>(color3(0, 0.9, 0))
+					},
+				std::initializer_list<int> {
+					0, 0, // bottom face
+					1, 1, // left face
+					2, 2, // right face
+					0 // everything else
+				}
 			)
 		);
 
@@ -177,10 +187,10 @@ public:
 
 	virtual camera makeCamera(double aspectRatio) {
 		camera_config cameraConfig;
-		cameraConfig.lookFrom = point3(0, 0, -0.95);
+		cameraConfig.lookFrom = point3(0, 0, -1.95);
 		cameraConfig.lookAt = point3(0, 0, 1);
 		cameraConfig.worldUp = vec3(0, 1, 0);
-		cameraConfig.verticalFovInDegrees = 90; // in degrees
+		cameraConfig.verticalFovInDegrees = 85; // in degrees
 		cameraConfig.aspectRatio = aspectRatio;
 		cameraConfig.aperture = 0.05;
 		cameraConfig.focalLength =
