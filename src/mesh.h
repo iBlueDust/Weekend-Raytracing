@@ -60,7 +60,7 @@ public:
 		const Ray& ray,
 		double tMin, double tMax
 	) const {
-		if (!aabb.contains(ray))
+		if (!aabb.hit(ray, tMin, tMax))
 			return {};
 
 		HitRecord record;

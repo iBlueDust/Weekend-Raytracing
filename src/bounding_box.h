@@ -5,62 +5,6 @@
 
 // Axis-Aligned Bounding Box (AABB)
 class BoundingBox {
-private:
-	class Rectangle {
-	public:
-		double xMin, yMin;
-		double xMax, yMax;
-
-		Rectangle() {}
-		Rectangle(
-			double xMin, double yMin, double xMax, double yMax
-		) : xMin(xMin), yMin(yMin), xMax(xMax), yMax(yMax) {}
-
-		bool contains(double x, double y) const {
-			return xMin <= x && xMax >= x
-				&& yMin <= y && yMax >= y;
-		}
-	};
-
-	enum Axis {
-		X = 0,
-		Y = 1,
-		Z = 2
-	};
-
-	std::pair<Axis, Axis> axesPerpendicularTo(Axis axis) const {
-		constexpr std::pair<Axis, Axis> table[3] = {
-			{ Axis::Y, Axis::Z },
-			{ Axis::X, Axis::Z },
-			{ Axis::X, Axis::Y },
-		};
-
-		return table[axis];
-	};
-
-	bool doesRayIntersectAxisAlignedRectangle(
-		const Ray& ray,
-		Axis axis,
-		const Rectangle& rectangle,
-		double rectanglePosition
-	) const {
-		double origin = ray.origin.elements[axis];
-		double direction = ray.direction.elements[axis];
-		double t = (rectanglePosition - origin) / direction;
-
-		// Check if rectangle is behind the ray
-		if (t <= 0)
-			return false;
-
-		point3 intersection = ray.at(t);
-
-		auto perpendicularAxes = axesPerpendicularTo(axis);
-		double xInRectangleSpace = intersection.elements[perpendicularAxes.first];
-		double yInRectangleSpace = intersection.elements[perpendicularAxes.second];
-
-		return rectangle.contains(xInRectangleSpace, yInRectangleSpace);
-	}
-
 public:
 	BoundingBox() : cornerMin(0), cornerMax(0) {}
 	BoundingBox(point3 corner1, point3 corner2) :
@@ -81,17 +25,26 @@ public:
 			&& cornerMin.z <= point.z && cornerMax.z >= point.z;
 	}
 
-	bool contains(const Ray& ray) const {
-		// xRectangle means it is perpendicular to the x axis, and so forth
-		auto xRectangle = Rectangle(cornerMin.y, cornerMin.z, cornerMax.y, cornerMax.z);
-		auto yRectangle = Rectangle(cornerMin.x, cornerMin.z, cornerMax.x, cornerMax.z);
-		auto zRectangle = Rectangle(cornerMin.x, cornerMin.y, cornerMax.x, cornerMax.y);
-		return doesRayIntersectAxisAlignedRectangle(ray, Axis::X, xRectangle, cornerMin.x)
-			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::X, xRectangle, cornerMax.x)
-			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::Y, yRectangle, cornerMin.y)
-			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::Y, yRectangle, cornerMax.y)
-			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::Z, zRectangle, cornerMin.z)
-			|| doesRayIntersectAxisAlignedRectangle(ray, Axis::Z, zRectangle, cornerMax.z);
+	// https://raytracing.github.io/books/RayTracingTheNextWeek#boundingvolumehierarchies/anoptimizedaabbhitmethod
+	bool hit(const Ray& ray, double tMin, double tMax) const {
+		for (int dimension = 0; dimension < 3; dimension++) {
+			double inverseDirection = 1.0 / ray.direction[dimension];
+			double t0 = (cornerMin[dimension] - ray.origin[dimension])
+				* inverseDirection;
+			double t1 = (cornerMax[dimension] - ray.origin[dimension])
+				* inverseDirection;
+
+			if (inverseDirection < 0.0)
+				std::swap(t0, t1);
+
+			tMin = std::max<double>(tMin, t0);
+			tMax = std::min<double>(tMax, t1);
+
+			if (tMax <= tMin)
+				return false;
+		}
+
+		return true;
 	}
 
 	void include(const point3& point) {
