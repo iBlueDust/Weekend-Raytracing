@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "ray.h"
 #include "vec3.h"
 
@@ -7,17 +9,15 @@
 class BoundingBox {
 public:
 	BoundingBox() : cornerMin(0), cornerMax(0) {}
-	BoundingBox(point3 corner1, point3 corner2) :
-		cornerMin(
-			std::min<double>(corner1.x, corner2.x),
-			std::min<double>(corner1.y, corner2.y),
-			std::min<double>(corner1.z, corner2.z)
-		),
-		cornerMax(
-			std::max<double>(corner1.x, corner2.x),
-			std::max<double>(corner1.y, corner2.y),
-			std::max<double>(corner1.z, corner2.z)
-		) {}
+	BoundingBox(point3 cornerMin, point3 cornerMax) :
+		cornerMin(cornerMin), cornerMax(cornerMax) {
+		
+		assert(
+			cornerMin.x < cornerMax.x
+			&& cornerMin.y < cornerMax.y
+			&& cornerMin.z < cornerMax.z
+		);
+	}
 
 	bool contains(const point3& point) const {
 		return cornerMin.x <= point.x && cornerMax.x >= point.x
