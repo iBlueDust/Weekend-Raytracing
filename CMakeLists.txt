@@ -6,7 +6,7 @@ cmake_minimum_required (VERSION 3.8)
 project ("Weekend Raytracing")
 
 # Add source to this project's executable.
-add_executable (WeekendRaytracing "src/main.cpp" "src/main.h" "src/vec3.h" "src/color.h" "src/ray.h" "src/hittable.h" "src/sphere.h" "src/hittable_list.h" "src/commons.h" "src/camera.h" "src/rng.h" "src/mesh.h"  "src/bounding_box.h" )
+add_executable (WeekendRaytracing "src/main.cpp" "src/main.h" "src/vec3.h" "src/color.h" "src/ray.h" "src/hittable.h" "src/sphere.h" "src/hittable_list.h" "src/commons.h" "src/camera.h" "src/rng.h" "src/mesh.h"  "src/bounding_box.h"  "src/bounding_volume_hierarchy.h")
 
 # Flags
 if (NOT CMAKE_BUILD_TYPE)

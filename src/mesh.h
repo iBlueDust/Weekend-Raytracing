@@ -48,21 +48,18 @@ public:
 		if (materialPtrs.size() <= 0)
 			throw std::invalid_argument(
 				"Mesh requires at least one material pointer"
-			);
+			);		
 
-		aabb.cornerMax = aabb.cornerMin = *vertices.begin();
-		// skip first vertex
-		for (const auto& vertex : vertices | std::views::drop(1))
-			aabb.include(vertex);		
+		// Precalculate bounding box
+		aabb = generateBoundingBox(vertices);
 	}
+
+	typedef Hittable super;
 
 	virtual std::optional<HitRecord> hit(
 		const Ray& ray,
 		double tMin, double tMax
 	) const {
-		if (!aabb.hit(ray, tMin, tMax))
-			return {};
-
 		HitRecord record;
 		record.t = tMax; 
 
@@ -104,7 +101,27 @@ public:
 		return record;
 	}
 
+	virtual std::optional<BoundingBox> boundingBox(
+		double tStart, double tEnd
+	) const {
+		return aabb;
+	}
+
 private:
+
+	BoundingBox generateBoundingBox(std::initializer_list<point3> vertices) {
+		assert(vertices.size() > 0);
+
+		BoundingBox aabb;
+		aabb.cornerMax = aabb.cornerMin = *vertices.begin();
+
+		for (const auto& vertex : vertices | std::ranges::views::drop(1)) {
+			aabb.include(vertex);
+		}
+
+		return aabb;
+	}
+
 	// Triangle in 3D space
 	class Triangle {
 	public:

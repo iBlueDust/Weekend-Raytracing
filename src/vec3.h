@@ -4,6 +4,14 @@
 
 #include "commons.h"
 
+enum Axis {
+	X = 0,
+	Y = 1,
+	Z = 2,
+
+	count = 3 // to help with for loops
+};
+
 class vec3 {
 public:
 	union {

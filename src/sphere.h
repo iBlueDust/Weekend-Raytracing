@@ -17,10 +17,16 @@ public:
 	Sphere(point3 center, double radius, std::shared_ptr<Material> materialPtr) 
 		: center(center), radius(radius), materialPtr(materialPtr) {}
 
-	virtual std::optional<HitRecord> hit(const Ray& ray, double tMin, double tMax) const override;
+	virtual std::optional<HitRecord> hit
+		(const Ray& ray, double tMin, double tMax) const override;
+
+	virtual std::optional<BoundingBox> boundingBox
+		(double tStart, double tEnd) const override;
 };
 
-std::optional<HitRecord> Sphere::hit(const Ray& ray, double tMin, double tMax) const {
+std::optional<HitRecord> Sphere::hit(
+	const Ray& ray, double tMin, double tMax
+) const {
 	auto deltaCenter = ray.origin - center;
 
 	// Setup quadratic equation
@@ -50,4 +56,11 @@ std::optional<HitRecord> Sphere::hit(const Ray& ray, double tMin, double tMax) c
 	result.materialPtr = materialPtr;
 
 	return result;
+}
+
+std::optional<BoundingBox> Sphere::boundingBox(
+	double tStart, double tEnd
+) const {
+	auto halfBox = point3(radius);
+	return BoundingBox(center - halfBox, center + halfBox);
 }

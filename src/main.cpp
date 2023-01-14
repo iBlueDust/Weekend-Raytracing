@@ -12,6 +12,8 @@
 #include <thread>
 
 #include "main.h"
+
+#include "bounding_volume_hierarchy.h"
 #include "camera.h"
 #include "color.h"
 #include "hittable.h"
@@ -24,7 +26,7 @@
 
 
 color3 rayColor(
-	const HittableList& world, 
+	const Hittable& world, 
 	const color3& background,
 	const Ray& ray, 
 	const int maxBounces, 
@@ -60,7 +62,7 @@ void render(
 	const int sampleCount,
 	const int seed,
 	const int maxBounces,
-	const HittableList& world,
+	const Hittable& world,
 	const Camera& camera,
 	std::vector<color3>& image,
 	int& scanlinesDone
@@ -81,7 +83,7 @@ void render(
 				auto v = double(row + rng.randomDouble()) / (height - 1);
 
 				Ray ray = camera.rayFromUV(u, v, rng);
-				pixel += rayColor(world, color3(0), ray, maxBounces, rng);
+				pixel += rayColor(world, color3(0.5, 0.5, 0.8), ray, maxBounces, rng);
 			}
 			image[j * width + i] = pixel / sampleCount;
 		}
@@ -120,7 +122,12 @@ int main(int argc, char** argv) {
 
 	// World
 	cornell_box_scene masterScene;
-	HittableList world = masterScene.build();
+
+	//HittableList world = masterScene.build();
+
+	HittableList worldHittables = masterScene.build();
+	BoundingVolumeHierarchyNode world(worldHittables, 0.0, 0.0);
+	printf("BVH Built.");
 
 	// Camera
 	Camera mainCamera = masterScene.makeCamera(aspectRatio);

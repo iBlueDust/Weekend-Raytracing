@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <vector>
 
 #include "hittable.h"
@@ -33,7 +34,11 @@ public:
 		hittables.clear();
 	}
 
-	virtual std::optional<HitRecord> hit(const Ray& ray, double tMin, double tMax) const override;
+	virtual std::optional<HitRecord> hit
+		(const Ray& ray, double tMin, double tMax) const override;
+
+	virtual std::optional<BoundingBox> boundingBox
+		(double tStart, double tEnd) const override;
 };
 
 std::optional<HitRecord> HittableList::hit(const Ray& ray, double tMin, double tMax) const {
@@ -55,4 +60,27 @@ std::optional<HitRecord> HittableList::hit(const Ray& ray, double tMin, double t
 	}
 
 	return closestHit;
+}
+
+std::optional<BoundingBox> HittableList::boundingBox(
+	double tStart, double tEnd
+) const {
+	if (hittables.empty())
+		return {};
+
+	auto firstBoundingBox = hittables[0]->boundingBox(tStart, tEnd);
+	if (!firstBoundingBox)
+		return {};
+
+	BoundingBox result = firstBoundingBox.value();
+
+	for (const auto& hittable : hittables | std::ranges::views::drop(1)) {
+		auto boundingBox = hittable->boundingBox(tStart, tEnd);
+		if (!boundingBox.has_value())
+			return {};
+
+		result = BoundingBox::merge(result, boundingBox.value());
+	}
+
+	return result;
 }

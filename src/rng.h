@@ -15,6 +15,11 @@ public:
 		return min + (max - min) * randomDouble();
 	}
 
+	// Returns random x between min and max INCLUSIVE
+	int randomInt(int min, int max) {
+		return static_cast<int>(randomDouble(min, max + 1));
+	}
+
 private:
 	std::uniform_real_distribution<double> distribution;
 	std::mt19937 engine;

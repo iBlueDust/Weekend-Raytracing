@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 
+#include "bounding_box.h"
 #include "ray.h"
 
 class Material;
@@ -28,6 +29,8 @@ struct HitRecord {
 class Hittable {
 public:
 	virtual std::optional<HitRecord> hit
-	(const Ray& ray, double tMin, double tMax) const = 0;
+		(const Ray& ray, double tMin, double tMax) const = 0;
 
+	virtual std::optional<BoundingBox> boundingBox
+		(double tStart, double tEnd) const = 0;
 };

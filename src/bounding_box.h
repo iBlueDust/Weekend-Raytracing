@@ -57,6 +57,21 @@ public:
 		cornerMax.z = std::max<double>(cornerMax.z, point.z);
 	}
 
+	static BoundingBox merge(const BoundingBox& a, const BoundingBox& b) {
+		return BoundingBox(
+			point3(
+				std::min<double>(a.cornerMin.x, b.cornerMin.x),
+				std::min<double>(a.cornerMin.y, b.cornerMin.y),
+				std::min<double>(a.cornerMin.z, b.cornerMin.z)
+			),
+			point3(
+				std::max<double>(a.cornerMax.x, b.cornerMax.x),
+				std::max<double>(a.cornerMax.y, b.cornerMax.y),
+				std::max<double>(a.cornerMax.z, b.cornerMax.z)
+			)
+		);
+	}
+
 	// It is always true that
 	// cornerMin.x <= cornerMax.x
 	// cornerMin.y <= cornerMax.y
