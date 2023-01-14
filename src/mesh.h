@@ -11,6 +11,8 @@
 #include "material.h"
 #include "vec3.h"
 
+// TODO: implement BVH on Mesh as well
+
 class Mesh : public Hittable {
 private:
 	std::vector<point3> vertices;

@@ -10,9 +10,9 @@
 #include "mesh.h"
 #include "sphere.h"
 
-class scene {
+class Scene {
 public:
-	scene() {}
+	Scene() {}
 
 	virtual HittableList build() = 0;
 	virtual Camera makeCamera(double aspectRatio) = 0;
@@ -21,9 +21,9 @@ public:
 
 // SCENES
 
-class tutorial_scene : public scene {
+class TutorialScene : public Scene {
 public:
-	tutorial_scene() {}
+	TutorialScene() {}
 
 	virtual HittableList build() override {
 		HittableList world;
@@ -59,9 +59,9 @@ public:
 	}
 };
 
-class book_cover_scene : public scene {
+class BookCoverScene : public Scene {
 public:
-	book_cover_scene() {}
+	BookCoverScene() {}
 
 	virtual HittableList build() override {
 		HittableList world;
@@ -130,9 +130,9 @@ public:
 	}
 };
 
-class cornell_box_scene : public scene {
+class CornellBoxScene : public Scene {
 public:
-	cornell_box_scene() {}
+	CornellBoxScene() {}
 
 	virtual HittableList build() override {
 		HittableList world;

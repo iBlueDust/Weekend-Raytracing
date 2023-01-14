@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
 	const int maxBounces = 50;
 
 	// World
-	cornell_box_scene masterScene;
+	CornellBoxScene masterScene;
 
 	//HittableList world = masterScene.build();
 
