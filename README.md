@@ -25,10 +25,10 @@ cornell_box_scene masterScene;
 HittableList world = masterScene.build();
 ```
 
-and replace `cornell_box_scene` with the scenes defined in `scene.h`, including
-- `tutorial_scene`
-- `book_cover_scene`
-- `cornell_box_scene`
+and replace `CornellBoxScene` with the scenes defined in `scene.h`, including
+- `TutorialScene`
+- `BookCoverScene`
+- `CornellBoxScene`
 
 ## License
 ```
