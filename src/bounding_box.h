@@ -13,9 +13,9 @@ public:
 		cornerMin(cornerMin), cornerMax(cornerMax) {
 		
 		assert(
-			cornerMin.x < cornerMax.x
-			&& cornerMin.y < cornerMax.y
-			&& cornerMin.z < cornerMax.z
+			cornerMin.x <= cornerMax.x
+			&& cornerMin.y <= cornerMax.y
+			&& cornerMin.z <= cornerMax.z
 		);
 	}
 
